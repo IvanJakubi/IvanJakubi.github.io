@@ -597,3 +597,30 @@ h1 {
 
 .intro + .intro { margin-top: 1.1rem; }
 .intro:last-of-type { margin-bottom: 2.4rem; }
+
+
+/* --- placeholder tile for titles with no store art -------------- */
+
+.otherlist .icon.placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-style: dashed;
+  color: var(--muted);
+}
+
+.otherlist .icon.placeholder .ico {
+  width: 20px;
+  height: 20px;
+  opacity: 0.7;
+}
+
+.otherlist span.title { color: var(--text); }
+
+
+/* --- accent highlight inside body copy -------------------------- */
+
+.hl {
+  color: var(--accent);
+  font-weight: 500;
+}
