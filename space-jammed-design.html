@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Space Jammed: Game Design Case Study - Ivan Jakubi</title>
+<meta name="description" content="How I designed Space Jammed, a co-op sci-fi action horror FPS: cargo that sets the difficulty, the debt loop, warp pacing, enemy budgets, ship events that split the crew, room damage and onboarding through a contract.">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="case-study.css">
+<script src="lightbox.js" defer></script>
+</head>
+<body class="cs">
+
+<nav class="cs-top">
+  <a href="index.html">&larr; Back to portfolio</a>
+</nav>
+
+<header class="cs-hero">
+  <p class="eyebrow"><svg class="eb-ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="7.25" cy="7.25" r="4.25"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="1.2"/><path d="M15.25 3l4.25 7.5h-8.5z"/></svg>Game design case study</p>
+  <h1>Space Jammed</h1>
+  <p class="role">Game Designer &amp; Co-Founder · Tiny Tales Studio · 2026–present</p>
+
+  <figure class="cs-cover">
+    <img src="https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/4589250/e82b9e8292e04630ffa76e6d81e05d52e9fe71cd/ss_e82b9e8292e04630ffa76e6d81e05d52e9fe71cd.1920x1080.jpg" alt="Space Jammed screenshot: aliens boarding the ship" width="1920" height="1080">
+  </figure>
+
+  <p class="intro">
+    Space Jammed is a co-op sci-fi action horror FPS for up to four players. The crew owes a corporation a lot of money, and the only way to pay it back is by smuggling cargo through an unstable wormhole. Once they jump in, aliens board the ship, systems start failing, and the crew has to split up to keep everything running.
+  </p>
+  <p class="intro">
+    It's a personal project I work on in my free time with two friends from the industry. I designed every feature and wrote the design documents. I also laid out the ship and designed the UI, and I handle the lighting, parts of the gameplay code and the marketing.
+  </p>
+
+  <dl class="facts">
+    <div><dt>Genre</dt><dd>Co-op action horror FPS</dd></div>
+    <div><dt>Players</dt><dd>1–4, online co-op</dd></div>
+    <div><dt>Engine</dt><dd>Unity 6, URP</dd></div>
+    <div><dt>Network</dt><dd>Peer-to-peer, Steam lobbies</dd></div>
+    <div><dt>Status</dt><dd>In development, on Steam</dd></div>
+    <div><dt>Tools</dt><dd>Google Docs &amp; Sheets, Excalidraw</dd></div>
+  </dl>
+</header>
+
+<main>
+
+<section id="pillars">
+  <h2>Three rules for every feature</h2>
+  <div class="bossgrid three">
+    <div class="bcard"><p class="bh">Risk is chosen</p><p>The players set the difficulty of every run by choosing how much risk they take on to clear the debt faster. The game never sets it for them.</p></div>
+    <div class="bcard"><p class="bh">Equipment distribution matters</p><p>Each player carries only five items. The crew has to split the weapons and tools between them to be ready for whatever breaks next.</p></div>
+    <div class="bcard"><p class="bh">Splitting up is mandatory</p><p>Problems happen all over the ship at once. Someone always has to leave the group to fix one, or pull enemies away from the person fixing it.</p></div>
+  </div>
+  <p class="diag-note">The three design pillars from the GDD. Every system on this page serves at least one of them.</p>
+
+  <div class="diagram">
+    <p class="scores-title">The game loop</p>
+    <a class="looplink" href="img/sj/game-loop.png" target="_blank" rel="noopener"><img class="loopimg" src="img/sj/game-loop.png" alt="Game loop: choose cargo, enter warp, survive cycles of enemies and ship events, warp completed, buy upgrades, pay off debt, choose cargo again" loading="lazy"></a>
+  </div>
+</section>
+
+<section id="design">
+  <h2>Design work</h2>
+
+  <!-- 01 -->
+  <article class="decision feature">
+    <p class="dnum">01</p>
+    <h3>Cargo is the difficulty setting</h3>
+    <dl class="dgrid">
+      <dt>The idea</dt>
+      <dd>There is no difficulty menu. Instead, the crew picks which jobs to take. Every piece of cargo has its own difficulty, and the cargo they load decides how long the warp lasts, how hard it gets and how much it pays. Choosing the run is the first decision the crew makes together.</dd>
+      <dt>How it adds up</dt>
+      <dd>Each tier is worth a number of points. The points from all the loaded cargo are added up, and the total decides the difficulty of the whole run. A single Deadly crate won't make a Deadly run on its own. It takes three.</dd>
+    </dl>
+
+    <div class="formula">
+      <p class="fname">Run formulas</p>
+      <p class="feq">P = sum of cargo points</p>
+      <p class="feq">Payout = Multiplier(P) &times; P &times; 250</p>
+      <p class="feq">Warp duration = 150 + 7 &times; P seconds</p>
+    </div>
+
+    <div class="table-wrap">
+      <table class="cs-table ctable">
+        <thead><tr><th>Cargo tier</th><th>Points</th><th>Base reward</th><th></th><th>Run total</th><th>Run difficulty</th><th>Payout multiplier</th></tr></thead>
+        <tbody>
+          <tr><td>Easy</td><td>2</td><td>500</td><td></td><td>0+</td><td>Easy</td><td>1x</td></tr>
+          <tr><td>Medium</td><td>3</td><td>750</td><td></td><td>6+</td><td>Medium</td><td>1.2x</td></tr>
+          <tr><td>Hard</td><td>5</td><td>1,250</td><td></td><td>12+</td><td>Hard</td><td>1.5x</td></tr>
+          <tr><td>Very Hard</td><td>8</td><td>2,000</td><td></td><td>20+</td><td>Very Hard</td><td>1.9x</td></tr>
+          <tr><td>Extreme</td><td>12</td><td>3,000</td><td></td><td>30+</td><td>Extreme</td><td>2.6x</td></tr>
+          <tr><td>Deadly</td><td>18</td><td>4,500</td><td></td><td>45+</td><td>Deadly</td><td>5x</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <dl class="dgrid">
+      <dt>Worked example</dt>
+      <dd>Two Hard crates and one Very Hard crate add up to 18 points. That's a Hard run, so the payout is 1.5 &times; 18 &times; 250 = <b class="hl2">6,750 credits</b>, and the warp lasts 150 + 7 &times; 18 = 276 seconds, about four and a half minutes. Swapping one Hard crate for a Deadly one pushes the total to 31, an Extreme run that pays 20,150 and lasts just over six minutes.</dd>
+      <dt>Why the curve is steep</dt>
+      <dd>The multiplier nearly doubles at Deadly, from 2.6x to 5x. A greedy run should always be tempting, and a crew that survives one should feel like they got away with something.</dd>
+    </dl>
+    <figure class="cs-shot ui">
+      <img src="img/sj/ui-cargo.jpg" alt="Cargo selection UI mockup" loading="lazy">
+      <figcaption>My cargo selection mockup: each job shows its reward, difficulty and travel time, and the totals for the run sit on the right.</figcaption>
+    </figure>
+  </article>
+
+  <!-- 02 -->
+  <article class="decision feature">
+    <p class="dnum">02</p>
+    <h3>A debt that always pulls you back in</h3>
+    <dl class="dgrid">
+      <dt>The goal</dt>
+      <dd>Every session starts with the crew owing 100,000 credits, and paying it off wins the session. The debt gives every warp a purpose, and it's also where most of the game's humour comes from.</dd>
+      <dt>Half goes to the debt</dt>
+      <dd>After every successful warp, half of the payout goes straight to the debt, and the crew can't skip or lower it. The other half is theirs to spend on upgrades and repairs, or to put towards the debt as well. This way every good run brings the crew closer to winning, even if they would rather spend everything on upgrades.</dd>
+      <dt>Losing cargo hurts twice</dt>
+      <dd>If the cargo is destroyed, the warp fails and the payout is lost. On top of that, 75% of the cargo's worth is added to the debt. Harder cargo pays more, but losing it also digs the crew a deeper hole, which is what makes choosing cargo a real risk.</dd>
+      <dt>Interest</dt>
+      <dd>Every three warps, the corporation adds 15% of the debt as interest. Failed warps count too, so playing it safe doesn't stop the clock. Interest is charged after the automatic payment, so a good run on the third warp also lowers the interest. The cargo screen always shows how many warps are left before it hits, letting the crew decide whether to pay extra first or gamble on a bigger job.</dd>
+      <dt>A safety net</dt>
+      <dd>After the first warp, a crew that can't afford repairs, ammo or cloning can borrow more, up to a limit. That way a bad streak never locks a group out of the game.</dd>
+    </dl>
+    <div class="table-wrap">
+      <table class="cs-table">
+        <thead><tr><th>Event</th><th>Effect on a 10,000 credit job</th></tr></thead>
+        <tbody>
+          <tr><td>Delivered</td><td>5,000 to the debt, 5,000 to the crew</td></tr>
+          <tr><td>Cargo lost</td><td>No payout, and 7,500 added to the debt</td></tr>
+          <tr><td>Interest on a 60,000 debt</td><td>9,000 added every third warp</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <figure class="cs-shot ui">
+      <img src="img/sj/ui-debt.jpg" alt="Debt UI mockup" loading="lazy">
+      <figcaption>Debt screen mockup. The crew can pay extra in steps whenever they're outside the warp.</figcaption>
+    </figure>
+  </article>
+
+  <figure class="cs-shot">
+    <img src="https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/4589250/60556725013c61fe36fcd48a75d17a88a6aef0bf/ss_60556725013c61fe36fcd48a75d17a88a6aef0bf.1920x1080.jpg" alt="Space Jammed screenshot: an alien in the corridor" loading="lazy" width="1920" height="1080">
+  </figure>
+
+  <!-- 03 -->
+  <article class="decision feature">
+    <p class="dnum">03</p>
+    <h3>Pacing the warp in waves</h3>
+    <dl class="dgrid">
+      <dt>The problem</dt>
+      <dd>A horror game that is loud all the time stops being scary, and a co-op game where enemies never stop leaves no time to fix anything. The warp needed a rhythm: pressure, release, and a short, uneasy calm before the next wave.</dd>
+      <dt>Cycles</dt>
+      <dd>Every warp opens with a 25-second Zero Phase. Something breaks right away, the first enemies arrive at 10 seconds with 40% of the budget, and by 25 seconds they're at full strength. From there, the warp loops through cycles of roughly two minutes each.</dd>
+    </dl>
+    <div class="diagram">
+      <p class="scores-title">Enemy budget across a warp</p>
+      <svg class="pacechart" viewBox="0 0 640 230" role="img" aria-label="Enemy budget over a warp: a 25 second Zero Phase ramp, then repeating cycles of Loud, Winding Down, Quiet and Ramping.">
+<rect x="46.0" y="22" width="54.7" height="162" class="pb zero"/>
+<text x="73.4" y="200" class="pl">Zero</text>
+<rect x="100.7" y="22" width="105.1" height="162" class="pb loud"/>
+<text x="153.2" y="200" class="pl">Loud</text>
+<rect x="205.8" y="22" width="52.5" height="162" class="pb wind"/>
+<text x="232.0" y="200" class="pl">Winding Down</text>
+<rect x="258.3" y="22" width="65.7" height="162" class="pb quiet"/>
+<text x="291.1" y="200" class="pl">Quiet</text>
+<rect x="324.0" y="22" width="39.4" height="162" class="pb ramp"/>
+<text x="343.7" y="200" class="pl"></text>
+<rect x="363.4" y="22" width="105.1" height="162" class="pb loud"/>
+<text x="415.9" y="200" class="pl">Loud</text>
+<rect x="468.4" y="22" width="52.5" height="162" class="pb wind"/>
+<text x="494.7" y="200" class="pl">Winding Down</text>
+<rect x="520.9" y="22" width="65.7" height="162" class="pb quiet"/>
+<text x="553.8" y="200" class="pl">Quiet</text>
+<rect x="586.6" y="22" width="39.4" height="162" class="pb ramp"/>
+<text x="606.3" y="200" class="pl"></text>
+<line x1="46" x2="626" y1="147.2" y2="147.2" class="g"/><text x="40" y="151.2" class="ax" text-anchor="end">0.25x</text>
+<line x1="46" x2="626" y1="110.4" y2="110.4" class="g"/><text x="40" y="114.4" class="ax" text-anchor="end">0.5x</text>
+<line x1="46" x2="626" y1="36.7" y2="36.7" class="g"/><text x="40" y="40.7" class="ax" text-anchor="end">1x</text>
+<polyline points="46.0,184.0 67.9,184.0 67.9,125.1 85.4,80.9 100.7,36.7 205.8,36.7 258.3,147.2 324.0,147.2 363.4,36.7 468.4,36.7 520.9,147.2 586.6,147.2 626.0,36.7" class="bl"/>
+<circle cx="221.5" cy="69.9" r="5" class="ev"/>
+<path d="M148.2 24.7 l5 -8 l5 8 z" class="bo"/>
+<circle cx="484.2" cy="69.9" r="5" class="ev"/>
+<path d="M410.9 24.7 l5 -8 l5 8 z" class="bo"/>
+<text x="336.0" y="222" class="ax" text-anchor="middle">Seconds into the warp (two 120 s cycles shown)</text>
+</svg>
+      <div class="pacelegend"><span><i class="k ev"></i>Ship events spawn</span><span><i class="k bo"></i>Bosses can spawn</span></div>
+    </div>
+    <div class="table-wrap">
+      <table class="cs-table">
+        <thead><tr><th>Phase</th><th>Share of cycle</th><th>Enemy budget</th><th>What happens</th></tr></thead>
+        <tbody>
+          <tr><td>Loud</td><td>40%</td><td>1.0x</td><td>Full pressure. Bosses spawn here. No new ship events.</td></tr>
+          <tr><td>Winding Down</td><td>20%</td><td>1.0x &rarr; 0.25x</td><td>Ship events spawn 30% into the phase, as the fighting eases.</td></tr>
+          <tr><td>Quiet</td><td>25%</td><td>0.25x</td><td>The repair window. No new events.</td></tr>
+          <tr><td>Ramping</td><td>15%</td><td>0.25x &rarr; 1.0x</td><td>Enemies build back to full strength.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <dl class="dgrid">
+      <dt>Why events come late</dt>
+      <dd>Ship events only appear as the fighting winds down. The crew wins a fight, splits up to fix the ship during the Quiet phase, and is still spread out when the next Loud phase hits. That moment is where the best stories come from.</dd>
+      <dt>Acts</dt>
+      <dd>Longer warps are also split into three acts, running at 0.75x, 1x and 1.3x enemies and events, so a long run builds towards a finale. Between acts, a 30-second break drops the budget to 10% and gives the crew a real breather, and then the next act starts straight on Loud.</dd>
+      <dt>Keeping it fresh</dt>
+      <dd>Phase lengths vary by &plusmn;20% and event timing by &plusmn;15%, so players can feel the rhythm but never quite time it. The warp fits in as many roughly two-minute cycles as it can after the Zero Phase and the breaks.</dd>
+    </dl>
+  </article>
+
+  <!-- 04 -->
+  <article class="decision feature">
+    <p class="dnum">04</p>
+    <h3>An enemy budget built in layers</h3>
+    <dl class="dgrid">
+      <dt>The idea</dt>
+      <dd>Instead of scripted waves, enemies spawn against a budget, which is the most enemies that can be alive at once. Easy enemies cost 1 point, Medium 2 and Hard 3. Every rule in the game pushes that one number up or down, so the whole pacing can be tuned from a single sheet.</dd>
+    </dl>
+    <div class="formula">
+      <p class="fname">Live enemy budget</p>
+      <p class="feq">Budget = Base(difficulty) &times; Players &times; Act &times; Phase &times; Fatigue &times; Unrepaired events &times; Recovery &times; Boss suppression</p>
+    </div>
+    <div class="table-wrap">
+      <table class="cs-table">
+        <thead><tr><th>Layer</th><th>Range</th><th>What it does</th></tr></thead>
+        <tbody>
+          <tr><td>Base budget</td><td>6 to 36</td><td>Set by run difficulty: 6, 10, 16, 22, 28, 36</td></tr>
+          <tr><td>Player scaling</td><td>1x to 2.2x</td><td>1, 1.5, 1.9 and 2.2 for one to four players</td></tr>
+          <tr><td>Act</td><td>0.75x to 1.3x</td><td>Builds a long warp towards a finale</td></tr>
+          <tr><td>Phase</td><td>0.25x to 1x</td><td>The cycle rhythm above</td></tr>
+          <tr><td>Fatigue</td><td>1x to 1.3x</td><td>Builds up over a long warp</td></tr>
+          <tr><td>Unrepaired events</td><td>1x to 1.5x</td><td>Ignoring the ship makes the fight harder</td></tr>
+          <tr><td>Recovery bonus</td><td>0.6x</td><td>Fixing several events quickly earns a short break</td></tr>
+          <tr><td>Boss suppression</td><td>0.4x</td><td>When a boss spawns, regular enemies drop for 10 s, then ramp back over 20 s</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <dl class="dgrid">
+      <dt>Who shows up</dt>
+      <dd>Difficulty also decides which enemies show up. An Easy run is all Easy enemies, a Hard run mixes 35% Easy, 40% Medium and 25% Hard, and a Deadly run is 75% Hard. At its peak, a four-player Hard run can have up to 35 enemies on the ship at once.</dd>
+      <dt>Bosses</dt>
+      <dd>Bosses only spawn during Loud phases, starting from Medium difficulty. On Medium, one can appear every third Loud phase, while on Deadly up to five can be alive at once, with a new one every Loud phase. Each boss breaks the crew's plan in its own way. The Prowler leaps at whoever strays furthest from the group, the Behemoth leaves poison in every room it passes through, the Coloss takes over a room with its laser, and the Wraith keeps raising dead enemies until someone kills it.</dd>
+    </dl>
+  </article>
+
+  <figure class="cs-shot">
+    <img src="https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/4589250/7faa788f7d2a1e871903e364de41fedde541aa73/ss_7faa788f7d2a1e871903e364de41fedde541aa73.1920x1080.jpg" alt="Space Jammed screenshot: the power core" loading="lazy" width="1920" height="1080">
+  </figure>
+
+  <!-- 05 -->
+  <article class="decision feature">
+    <p class="dnum">05</p>
+    <h3>Ship events that split the crew</h3>
+    <dl class="dgrid">
+      <dt>The idea</dt>
+      <dd>Ship events are the second threat. Each one damages its room until someone fixes it, and most of them need a specific tool. Since every player only carries five items, the person with the right tool is usually on the other side of the ship.</dd>
+      <dt>Rules</dt>
+      <dd>Fixing an event means holding the interact button until a bar fills. Progress is kept if the player gets interrupted, and more players fill it faster. Events never spawn in a room with enemies. Most appear close to the players, but some are placed far away on purpose, and the more enemies are alive, the faster they damage the room.</dd>
+    </dl>
+    <div class="bossgrid">
+      <div class="bcard"><p class="bh">Fire Hazard</p><p>The most common event. It only damages the room, and its job is to send the player with the Extinguisher across the ship, away from the team.</p></div>
+      <div class="bcard"><p class="bh">AI Gone Rogue</p><p>The AI locks every computer and slams doors at random, hurting anyone caught in them. The player with the Decoder has to cross those corridors and hack the AI Room in order. It punishes a crew that is spread out.</p></div>
+      <div class="bcard"><p class="bh">Oxygen Leak</p><p>Two steps. Anyone can turn the valves to bring the pressure down, but only the Blowtorch can seal the pipes. The crew can always start the fix, even if the Blowtorch is on the other side of the ship.</p></div>
+      <div class="bcard"><p class="bh">Ammo Cook-off</p><p>The ammo crates start firing rounds. It needs the Extinguisher too, so a crew already fighting a fire has to decide which problem gets the tool first.</p></div>
+      <div class="bcard"><p class="bh">Engine Stall</p><p>The warp timer stops. Enemies and events keep coming. The most punishing event in the game and the easiest to read, because the number everyone is watching stops moving.</p></div>
+      <div class="bcard"><p class="bh">Vending Malfunction</p><p>The vending machines fire cans at anything that moves, enemies included. A smart crew can drag enemies through the crossfire. The comedy event, built to end up in clips.</p></div>
+      <div class="bcard"><p class="bh">Suspicious Cargo</p><p>A crate starts shaking. Shock it with the Electric Stick enough times or a boss climbs out of it.</p></div>
+      <div class="bcard"><p class="bh">Failed Clone</p><p>The cloning machine makes a hostile clone. Kill it with a weapon, then reset the machine with the Decoder. It hits hardest when someone is already dead.</p></div>
+    </div>
+  </article>
+
+  <!-- 06 -->
+  <article class="decision feature">
+    <p class="dnum">06</p>
+    <h3>Rooms that fail in ways you can feel</h3>
+    <dl class="dgrid">
+      <dt>The idea</dt>
+      <dd>Every room has health, and only ship events can damage it. When a room is destroyed, its door shuts, it stops spawning events, and its penalty stays active for the rest of the warp. I wanted every penalty to change how the game plays, not just lower a number.</dd>
+    </dl>
+    <div class="table-wrap">
+      <table class="cs-table">
+        <thead><tr><th>Room destroyed</th><th>Penalty for the rest of the warp</th></tr></thead>
+        <tbody>
+          <tr><td>Power Core</td><td>The whole ship switches to its no-power lighting</td></tr>
+          <tr><td>AI Room</td><td>Room health and event alerts disappear from the HUD</td></tr>
+          <tr><td>Oxygen Room</td><td>Sprinting now uses stamina</td></tr>
+          <tr><td>Engine Room</td><td>The warp gets longer, capped so it can't become unwinnable</td></tr>
+          <tr><td>Sleeping Quarters</td><td>The exhausted crew fixes events more slowly</td></tr>
+          <tr><td>Dining Room</td><td>Every player's maximum health drops</td></tr>
+          <tr><td>Hydroponics</td><td>All healing is slower and weaker</td></tr>
+          <tr><td>Armory, Med Bay, Cloning</td><td>No ammo restock, healing stations or revives</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <dl class="dgrid">
+      <dt>Damage carries over</dt>
+      <dd>Room damage carries over between warps, and repairs can only be bought outside the warp, priced per missing point of health. Fixing a destroyed room costs extra, so it always pays to repair early. Once six rooms are destroyed, including any that were already gone before the warp, the session is lost. A crew that keeps skipping repairs is heading for the end, even on warps they win.</dd>
+    </dl>
+    <figure class="cs-shot ui">
+      <img src="img/sj/ui-hud.jpg" alt="In-game HUD mockup" loading="lazy">
+      <figcaption>In-game HUD mockup: room health and active events on the left, credits, debt and travel time on the right.</figcaption>
+    </figure>
+    <figure class="cs-shot ui">
+      <img src="img/sj/ui-maintenance.jpg" alt="Maintenance UI mockup" loading="lazy">
+      <figcaption>Maintenance screen mockup: repair rooms, restock ammo and buy cloning capsules with the crew's half of the payout.</figcaption>
+    </figure>
+  </article>
+
+  <!-- 07 -->
+  <article class="decision">
+    <p class="dnum">07</p>
+    <h3>A ship you learn by heart</h3>
+    <dl class="dgrid">
+      <dt>The idea</dt>
+      <dd>Movement is kept simple: walk, sprint, jump and crouch. The skill is in knowing the ship. The rule I tuned movement around was that crossing the ship alone should feel survivable, but leaving the group should always feel like a gamble.</dd>
+      <dt>The layout</dt>
+      <dd>I laid out the ship over three floors. Every room is built around one function and its own events, so players learn where trouble will come from. The Captain's Room handles cargo, debt and upgrades, the cockpit starts the warp, and the Storage room holds the cargo, which looks different depending on the difficulty of the run.</dd>
+    </dl>
+    <div class="layoutgrid">
+      <a href="img/sj/layout-1.jpg" target="_blank" rel="noopener"><img src="img/sj/layout-1.jpg" alt="Ship layout, upper floor" loading="lazy"><span>Floor 1</span></a>
+      <a href="img/sj/layout-0.jpg" target="_blank" rel="noopener"><img src="img/sj/layout-0.jpg" alt="Ship layout, main floor" loading="lazy"><span>Floor 0</span></a>
+      <a href="img/sj/layout-m1.jpg" target="_blank" rel="noopener"><img src="img/sj/layout-m1.jpg" alt="Ship layout, lower floor" loading="lazy"><span>Floor -1</span></a>
+    </div>
+  </article>
+
+  <!-- 08 -->
+  <article class="decision">
+    <p class="dnum">08</p>
+    <h3>Equipment as data</h3>
+    <dl class="dgrid">
+      <dt>Five slots</dt>
+      <dd>Tools fix events, weapons fight, and hybrids like the Hammer and Electric Stick do both, though they still take up a full slot. There is never enough of any item for everyone, so players drop items to pass them around.</dd>
+      <dt>Built for tuning</dt>
+      <dd>I specified every item through three sets of data, built as ScriptableObjects, so items can be tuned without touching code. Base data covers how an item handles, kicks and sways, and how the camera reacts. Ranged data covers damage, weak points, recoil, spread and hit feedback. Melee data covers swing timing, arc, range and a short lunge towards the target.</dd>
+      <dt>Feel over numbers</dt>
+      <dd>Fire rates are locked to five tiers instead of free values, from Heavy at 90 rounds per minute to Shred at 900, so every weapon has a clear identity. Aim assist is split in two: reticle friction slows the aim near a target, and magnetism bends a near miss into a hit.</dd>
+    </dl>
+    <figure class="cs-shot ui">
+      <img src="img/sj/ui-upgrade.jpg" alt="Upgrade UI mockup" loading="lazy">
+      <figcaption>Upgrade screen mockup. Upgrades are shared by the whole crew.</figcaption>
+    </figure>
+  </article>
+
+  <!-- 09 -->
+  <article class="decision feature">
+    <p class="dnum">09</p>
+    <h3>No tutorial, just a contract</h3>
+    <dl class="dgrid">
+      <dt>The idea</dt>
+      <dd>Space Jammed has no tutorial. The first time a group starts the game, before they even see the ship, the corporation hands them a contract. It fills the screen, it can't be skipped or declined, and it's the only place where the rules are written down. Everything else is learned by getting it wrong.</dd>
+      <dt>The clauses</dt>
+      <dd>Each rule is a short, dry clause, written as if the crew is getting a great deal. The crew chooses the cargo and the danger. Damage to the vessel is their problem. Losing six compartments voids the agreement, lost cargo means no payment, and cloning is a paid service. Once they sign, the crew is handed a 100,000 credit debt and dropped into the ship.</dd>
+      <dt>Coming back</dt>
+      <dd>In every new session after that, the debt is back, and a short message from the corporation explains why. The amount never changes, but the excuse does, picked at random from a list that gets more absurd the further down it goes: "The CEO has purchased a second yacht. Congratulations are being accepted on Deck 4." It answers the question every player asks in their second session, and it does it with a joke instead of a menu.</dd>
+    </dl>
+  </article>
+
+</section>
+
+<section id="docs">
+  <h2>From the design documents</h2>
+  <p class="section-note">Sections from the Space Jammed GDD I wrote. Click a page to read it in full.</p>
+  <div class="docgrid">
+    <a class="doccard" href="img/sj/sj-pillars.png" target="_blank" rel="noopener">
+      <span class="docpaper"><img src="img/sj/sj-pillars.png" alt="GDD: technical information and design pillars" loading="lazy"></span>
+      <span class="doccap">Design pillars</span>
+    </a>
+    <a class="doccard" href="img/sj/sj-pacing.png" target="_blank" rel="noopener">
+      <span class="docpaper"><img src="img/sj/sj-pacing.png" alt="GDD: warp pacing tables" loading="lazy"></span>
+      <span class="doccap">Warp pacing</span>
+    </a>
+    <a class="doccard" href="img/sj/sj-events.png" target="_blank" rel="noopener">
+      <span class="docpaper"><img src="img/sj/sj-events.png" alt="GDD: ship events" loading="lazy"></span>
+      <span class="doccap">Ship events</span>
+    </a>
+    <a class="doccard" href="img/sj/sj-onboarding.png" target="_blank" rel="noopener">
+      <span class="docpaper"><img src="img/sj/sj-onboarding.png" alt="GDD: onboarding through the contract" loading="lazy"></span>
+      <span class="doccap">Onboarding</span>
+    </a>
+  </div>
+</section>
+
+<section id="gallery">
+  <h2>Screenshots</h2>
+  <div class="gallery">
+    <a href="https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/4589250/a12d5a697ded1de1f39fcec7d00870d21b6563cf/ss_a12d5a697ded1de1f39fcec7d00870d21b6563cf.1920x1080.jpg" target="_blank" rel="noopener"><img src="https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/4589250/a12d5a697ded1de1f39fcec7d00870d21b6563cf/ss_a12d5a697ded1de1f39fcec7d00870d21b6563cf.600x338.jpg" alt="Space Jammed screenshot" loading="lazy"></a>
+    <a href="https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/4589250/f03c4859433727d6c060c15651f35510f0008b6d/ss_f03c4859433727d6c060c15651f35510f0008b6d.1920x1080.jpg" target="_blank" rel="noopener"><img src="https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/4589250/f03c4859433727d6c060c15651f35510f0008b6d/ss_f03c4859433727d6c060c15651f35510f0008b6d.600x338.jpg" alt="Space Jammed screenshot" loading="lazy"></a>
+    <a href="https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/4589250/12efb13933851fb6e334099cf7f4d801e502a667/ss_12efb13933851fb6e334099cf7f4d801e502a667.1920x1080.jpg" target="_blank" rel="noopener"><img src="https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/4589250/12efb13933851fb6e334099cf7f4d801e502a667/ss_12efb13933851fb6e334099cf7f4d801e502a667.600x338.jpg" alt="Space Jammed screenshot" loading="lazy"></a>
+    <a href="https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/4589250/3fb569407c7012c98db7d8b25b97a669490f1357/ss_3fb569407c7012c98db7d8b25b97a669490f1357.1920x1080.jpg" target="_blank" rel="noopener"><img src="https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/4589250/3fb569407c7012c98db7d8b25b97a669490f1357/ss_3fb569407c7012c98db7d8b25b97a669490f1357.600x338.jpg" alt="Space Jammed screenshot" loading="lazy"></a>
+    <a href="https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/4589250/9c51261ec9a3382e4d5f550ec53b135f251b58c8/ss_9c51261ec9a3382e4d5f550ec53b135f251b58c8.1920x1080.jpg" target="_blank" rel="noopener"><img src="https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/4589250/9c51261ec9a3382e4d5f550ec53b135f251b58c8/ss_9c51261ec9a3382e4d5f550ec53b135f251b58c8.600x338.jpg" alt="Space Jammed screenshot" loading="lazy"></a>
+    <a href="https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/4589250/d9778ab0fe8b7bb09b8014c9f6c8873583f61136/ss_d9778ab0fe8b7bb09b8014c9f6c8873583f61136.1920x1080.jpg" target="_blank" rel="noopener"><img src="https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/4589250/d9778ab0fe8b7bb09b8014c9f6c8873583f61136/ss_d9778ab0fe8b7bb09b8014c9f6c8873583f61136.600x338.jpg" alt="Space Jammed screenshot" loading="lazy"></a>
+    <a href="https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/4589250/0db1bed39bc207626887bcc6e7781445c02a6f95/ss_0db1bed39bc207626887bcc6e7781445c02a6f95.1920x1080.jpg" target="_blank" rel="noopener"><img src="https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/4589250/0db1bed39bc207626887bcc6e7781445c02a6f95/ss_0db1bed39bc207626887bcc6e7781445c02a6f95.600x338.jpg" alt="Space Jammed screenshot" loading="lazy"></a>
+    <a href="https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/4589250/e18a805d1f8497b5fc893cb913363f945ad778c6/ss_e18a805d1f8497b5fc893cb913363f945ad778c6.1920x1080.jpg" target="_blank" rel="noopener"><img src="https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/4589250/e18a805d1f8497b5fc893cb913363f945ad778c6/ss_e18a805d1f8497b5fc893cb913363f945ad778c6.600x338.jpg" alt="Space Jammed screenshot" loading="lazy"></a>
+    <a href="https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/4589250/fa3b3645f21543bf8d307fe06464ad456ba66b0c/ss_fa3b3645f21543bf8d307fe06464ad456ba66b0c.1920x1080.jpg" target="_blank" rel="noopener"><img src="https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/4589250/fa3b3645f21543bf8d307fe06464ad456ba66b0c/ss_fa3b3645f21543bf8d307fe06464ad456ba66b0c.600x338.jpg" alt="Space Jammed screenshot" loading="lazy"></a>
+  </div>
+</section>
+
+<section id="takeaway">
+  <h2>What I took from it</h2>
+  <p class="intro">
+    On Space Jammed I designed every feature, starting from the first page of the document. Writing the three pillars down first gave every later decision something to be measured against: does it make the crew choose their risk, share their gear or split up?
+  </p>
+  <p class="intro">
+    Running the whole warp on one enemy budget, with every system pushing it up or down, keeps the pacing easy to tune. If a run feels too hard, the cause is in one of the layers, and the fix is a single value in a sheet.
+  </p>
+  <nav class="endnav">
+    <a class="btn btn-steam" href="https://store.steampowered.com/app/4589250/Space_Jammed/" target="_blank" rel="noopener"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M11.979 0C5.678 0 .511 4.86.022 11.037l6.432 2.658c.545-.371 1.203-.59 1.912-.59.063 0 .125.004.188.006l2.861-4.142V8.91c0-2.495 2.028-4.524 4.524-4.524 2.494 0 4.524 2.031 4.524 4.527s-2.03 4.525-4.524 4.525h-.105l-4.076 2.911c0 .052.004.105.004.159 0 1.875-1.515 3.396-3.39 3.396-1.635 0-3.016-1.173-3.331-2.727L.436 15.27C1.862 20.307 6.486 24 11.979 24c6.627 0 11.999-5.373 11.999-12S18.605 0 11.979 0zM7.54 18.21l-1.473-.61c.262.543.714.999 1.314 1.25 1.297.539 2.793-.076 3.332-1.375.263-.63.264-1.319.005-1.949s-.75-1.121-1.377-1.383c-.624-.26-1.29-.249-1.878-.03l1.523.63c.956.4 1.409 1.5 1.009 2.455-.397.957-1.497 1.41-2.454 1.012H7.54zm11.415-9.303c0-1.662-1.353-3.015-3.015-3.015-1.665 0-3.015 1.353-3.015 3.015 0 1.665 1.35 3.015 3.015 3.015 1.663 0 3.015-1.35 3.015-3.015zm-5.273-.005c0-1.252 1.013-2.266 2.265-2.266 1.249 0 2.266 1.014 2.266 2.266 0 1.251-1.017 2.265-2.266 2.265-1.253 0-2.265-1.014-2.265-2.265z"/></svg>Visit Space Jammed on Steam</a>
+    <a class="btn btn-design" href="index.html"><span aria-hidden="true">&larr;</span>Back to portfolio</a>
+  </nav>
+</section>
+
+</main>
+
+<footer>
+  <p>Zagreb, Croatia · <a href="mailto:jakubi.ivan@gmail.com">jakubi.ivan@gmail.com</a></p>
+</footer>
+
+</body>
+</html>

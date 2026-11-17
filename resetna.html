@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ReSetna: Production Case Study - Ivan Jakubi</title>
+<meta name="description" content="How I produced ReSetna, a 2.5D sci-fi metroidvania, with a team of 15: milestones, publisher deadlines, scope cuts, playtests and post-launch triage.">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="case-study.css">
+<script src="lightbox.js" defer></script>
+</head>
+<body class="cs">
+
+<nav class="cs-top">
+  <a href="index.html">&larr; Back to portfolio</a>
+  <a class="cs-switch" href="resetna-design.html">Game design case study &rarr;</a>
+</nav>
+
+<header class="cs-hero">
+  <p class="eyebrow"><svg class="eb-ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="4.6" height="16" rx="1.2"/><rect x="9.7" y="4" width="4.6" height="11" rx="1.2"/><rect x="16.4" y="4" width="4.6" height="7" rx="1.2"/></svg>Production case study</p>
+  <h1>ReSetna</h1>
+  <p class="role">COO &amp; Game Producer · Today's Games · 2023–2025</p>
+
+  <figure class="cs-cover">
+    <img src="https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2936080/7440886aaf8b9c8fd689414ded5d654ab322e9c5/ss_7440886aaf8b9c8fd689414ded5d654ab322e9c5.1920x1080.jpg"
+         alt="ReSetna screenshot" width="1920" height="1080">
+  </figure>
+
+  <p class="intro">
+    ReSetna is a 2.5D sci-fi metroidvania with seven zones and seven bosses.
+    I was the producer from the first prototype up until the Steam release. During that time, I was leading the team of 15 people, as well as communicating with investors and potential publishers. The game was shipped first on PC and then ported to consoles.
+  </p>
+  <p class="intro">
+    The planned scope was big for a team our size: seven zones, seven bosses,
+    up to 40 enemy types and around 25 hours of play for 100% completion.
+    This report will cover the production side of the project. I will go into detail about the decisions that shaped the schedule, the scope and the quality of the game, my reasoning for the decisions and the end result.
+  </p>
+
+  <dl class="facts">
+    <div><dt>Team</dt><dd>Up to 15 people</dd></div>
+    <div><dt>Engine</dt><dd>Unity</dd></div>
+    <div><dt>Funding</dt><dd>Investors</dd></div>
+    <div><dt>Publisher</dt><dd>Module16</dd></div>
+    <div><dt>Released</dt><dd>30 Jan 2025, Steam</dd></div>
+    <div><dt>Tools</dt><dd>ClickUp, Discord, Google Sheets</dd></div>
+  </dl>
+</header>
+
+<main>
+
+<section id="decisions">
+  <h2>Key decisions</h2>
+
+  <!-- 02 -->
+  <article class="decision">
+    <p class="dnum">01</p>
+    <h3>Reducing the amount of meetings while maintaining regular communication</h3>
+    <dl class="dgrid">
+      <dt>Context</dt>
+      <dd>Early on we had regular weekly meetings for the whole team. As the project grew, the amount of work in every sprint grew with it, and the meetings started to eat into the time people had to actually do that work.</dd>
+      <dt>Why</dt>
+      <dd>The feedback came from the team itself. They told me they needed more uninterrupted time to build what the milestones required. A weekly meeting where everyone reports on half-finished work was not helping anyone move faster, it was only breaking up their day.</dd>
+      <dt>Decision</dt>
+      <dd>I dropped the mandatory weekly meetings and moved us to two-week sprints. Each sprint started with one planning meeting where we went through what was done, what carries over and what comes next. Outside of that, we only met about a task when it was necessary, when someone had a question that needed to be cleared up or something to show. On top of that, I had a monthly 1 on 1 with every team member.</dd>
+      <dt>Result</dt>
+      <dd>The team got their focus time back, and questions still got answered quickly because people knew they could call a short meeting whenever they were blocked. The 1 on 1s gave me a place to hear problems before they grew, and the planning meetings gave us a written record of every sprint.</dd>
+    </dl>
+  </article>
+
+  <figure class="cs-shot">
+    <img src="https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2936080/076bd48f653e016c431c60a52efb3b1c002e5ec8/ss_076bd48f653e016c431c60a52efb3b1c002e5ec8.1920x1080.jpg"
+         alt="ReSetna boss fight" loading="lazy" width="1920" height="1080">
+  </figure>
+
+  <!-- 04 -->
+  <article class="decision">
+    <p class="dnum">02</p>
+    <h3>Dropping Early Access</h3>
+    <dl class="dgrid">
+      <dt>Context</dt>
+      <dd>Our plan was to launch in Early Access at the end of September 2024, with full release a few months after. Gamescom and Steam Next Fest were both in that window.</dd>
+      <dt>Decision</dt>
+      <dd>After a strategy call, we dropped Early Access completely. All of that effort went into a polished Steam Next Fest demo built around one zone, Polis 13. We also built a short, linear 5-minute demo for the Gamescom show floor.</dd>
+      <dt>Why</dt>
+      <dd>The gap between Early Access and full release was too short to build up wishlists, and wishlists are what decide visibility on Steam at launch. Two launches close together would split our and the players' attention.</dd>
+      <dt>Result</dt>
+      <dd>We got a cleaner schedule with two clear dates: content complete in October and a release candidate on 15 November. The demo became our main marketing tool going into launch.</dd>
+    </dl>
+  </article>
+
+  <!-- 06 -->
+  <article class="decision">
+    <p class="dnum">03</p>
+    <h3>Scoping seven bosses to fit the schedule</h3>
+    <dl class="dgrid">
+      <dt>Context</dt>
+      <dd>Bosses were the most "expensive" content in the game. Each one needed design, rigging, animation, its own arena with unique props, VFX and sound. All seven of them would not fit into the schedule if we built them all with the same level of complexity.</dd>
+      <dt>Decision</dt>
+      <ul class="dlist">
+        <li>Once a boss's core attacks worked, I feature locked it so the team could move on to the next one. Extra features could only be developed if there was enough time left at the end.</li>
+        <li>We started with the bosses whose design was the most complete, so animation and code never waited on design.</li>
+        <li>Not every boss encounter needed to be a fight. Some encounters were designed as chase sequences, platforming sections or something else that a developer could work on while the rest of the team worked on complex fights.</li>
+      </ul>
+      <dt>Why</dt>
+      <dd>If we decided to develop every boss encounter as a full-on fight, it would take us significantly more time to complete the game on an already tight deadline.</dd>
+      <dt>Result</dt>
+      <dd>Changing some of the bosses diversified the encounters and allowed us to keep all seven zones that we planned on.</dd>
+    </dl>
+  </article>
+
+  <!-- 07 -->
+  <article class="decision">
+    <p class="dnum">04</p>
+    <h3>Making QA a daily habit for the whole team</h3>
+    <dl class="dgrid">
+      <dt>Context</dt>
+      <dd>We were getting close to content complete and the release candidate. We could hire temporary QA testers, but they could never cover the whole game.</dd>
+      <dt>Decision</dt>
+      <dd>Every team member spent 30 to 60 minutes a day testing, during working hours, whenever it suited them. Each person picked one focus area: a combat zone, a boss, exploration, visuals, UI or quests.</dd>
+      <dt>How it worked</dt>
+      <dd>Bugs went into ClickUp with four urgency levels (Blocker, High, Mid, Low) and area tags (Player, Levels, UI, Quests). Opinions and feedback went into a separate Discord forum, so they would not clutter the bug list. Every Monday we picked bugs to fix in the dev meeting, and team playthroughs were where we discussed feedback.</dd>
+      <dt>Result</dt>
+      <dd>Bugs were caught by the people who knew the systems best, and the whole team played the game regularly instead of only their own part of it.</dd>
+    </dl>
+  </article>
+
+  <figure class="cs-shot">
+    <img src="https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2936080/3062a3349feca625a0afede7e140f2feaa5bffdb/ss_3062a3349feca625a0afede7e140f2feaa5bffdb.1920x1080.jpg"
+         alt="ReSetna combat" loading="lazy" width="1920" height="1080">
+  </figure>
+
+  <!-- 08 -->
+  <article class="decision feature">
+    <p class="dnum">05</p>
+    <h3>Turning playtest feedback into a combat and onboarding overhaul</h3>
+    <dl class="dgrid">
+      <dt>Context</dt>
+      <dd>
+        In summer 2024 we had two rounds of feedback on the feature complete build.
+        First, our own survey where testers scored 19 combat and movement questions from 1 to 10.
+        Then the publisher's playtest, with their internal team and external testers playing for about an hour each.
+      </dd>
+    </dl>
+
+    <div class="scores">
+      <p class="scores-title">Our survey, average score out of 10</p>
+      <div class="bar"><span class="bl">Boss fight design</span><span class="bt"><span style="width:77.7%"></span></span><span class="bv">7.8</span></div>
+      <div class="bar"><span class="bl">Movement control</span><span class="bt"><span style="width:75.4%"></span></span><span class="bv">7.5</span></div>
+      <div class="bar"><span class="bl">Pace and flow</span><span class="bt"><span style="width:72.3%"></span></span><span class="bv">7.2</span></div>
+      <div class="bar"><span class="bl">Combat engagement</span><span class="bt"><span style="width:61.5%"></span></span><span class="bv">6.2</span></div>
+      <div class="bar low"><span class="bl">Enemy challenge</span><span class="bt"><span style="width:58.5%"></span></span><span class="bv">5.9</span></div>
+      <div class="bar low"><span class="bl">Combat responsiveness</span><span class="bt"><span style="width:55.4%"></span></span><span class="bv">5.5</span></div>
+    </div>
+
+    <dl class="dgrid">
+      <dt>What we heard</dt>
+      <dd>
+        Movement and bosses were working. Combat was not. Testers could not cancel their attacks, the parry felt awkward and slow weapons were not worth using.
+        The publisher added two more problems: the game was too hard from the very first enemy, and the tutorial gave too much information at once.
+      </dd>
+      <dt>How I handled it</dt>
+      <dd>
+        I merged both reports into one summary and grouped everything into themes: difficulty, combat feel, tutorial, navigation and bugs.
+        I treated problems that came up in both rounds differently from single opinions. Two enemies, the Blade Cutter and the flying drones, came up far more than any other, so I wrote a separate report just for them.
+        Every finding then became a ClickUp task with an owner and went into the sprints next to content work, and fixes didn't have to wait until the end.
+      </dd>
+    </dl>
+
+    <div class="table-wrap">
+      <table class="cs-table">
+        <thead><tr><th>Feedback</th><th>What we changed</th></tr></thead>
+        <tbody>
+          <tr><td>Combat felt clunky, enemies interrupted the player but not the other way around</td><td>Added animation cancelling with jump, dash and parry, plus directional attacks. Ground pound cancels combos. Removed slow motion on combos and pushback in the air, so the player keeps momentum.</td></tr>
+          <tr><td>Parry was hard to read and not worth the risk</td><td>Added a VFX warning before an enemy parries, made enemy wind-ups easier to see, parried drones now get pushed away, and parry timing is tuned separately for small and large enemies.</td></tr>
+          <tr><td>Too hard from the start, no way to heal</td><td>Lowered damage on some early enemies, fixed the Blade Cutter's inconsistent behaviour, added healing and save stations. Enemies no longer attack during dialogue or at save stations.</td></tr>
+          <tr><td>Hits did not register reliably</td><td>Bigger weapon colliders, and large enemies got hitboxes on their legs as well as their body.</td></tr>
+          <tr><td>Tutorial overload</td><td>Replaced pop-up tutorials with a separate four-step tutorial level: platforming, attacks, parry and dodge, and breaking an enemy's parry.</td></tr>
+          <tr><td>Getting lost, no settings</td><td>Added a minimap and an options menu.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <dl class="dgrid">
+      <dt>Result</dt>
+      <dd>The combat and parry changes went out in the Steam demo update in October 2024, and the rest came with the launch and the first patch. The bigger change was in how we worked: playtests now fed straight into sprint planning.</dd>
+    </dl>
+  </article>
+
+  <!-- 09 -->
+  <article class="decision feature">
+    <p class="dnum">06</p>
+    <h3>Running post-launch feedback through one triage sheet</h3>
+    <dl class="dgrid">
+      <dt>Context</dt>
+      <dd>Shortly before launch, we ran one more round with outside testers and sorted about 100 reported issues into three groups: bugs, gameplay issues and design issues. After launch, feedback came from everywhere at once: Steam discussions, Reddit, Twitch clips and our own team, from players all over the world. Without a system, the loudest posts would set our priorities.</dd>
+      <dt>Decision</dt>
+      <dd>
+        Everything went into one shared sheet. The community team logged each report with a link to the original post.
+        I set the priority and assigned a developer. The developer wrote a short decision, and the community team replied to the player with the outcome.
+      </dd>
+    </dl>
+
+    <div class="minis">
+      <div><span class="num">284</span><span class="lbl">reports logged</span></div>
+      <div><span class="num">~57</span><span class="lbl">players reporting</span></div>
+      <div><span class="num">174</span><span class="lbl">marked solved</span></div>
+    </div>
+
+    <div class="fixlist">
+      <h4>What we fixed</h4>
+      <ul>
+        <li><b>Navigation</b>, the most requested change: a minimap on by default with an option to hide it, map tags for quests, and menus that return to the previous menu instead of the game.</li>
+        <li><b>Combat feel</b>: directional attacks cancel the attack queue, no more stun on light pushback, shorter delay after a parry, and drones stay in melee range.</li>
+        <li><b>Fairness</b>: enemies are pacified at save stations, enemy waves get a spawn effect one second before they appear, and spike hitboxes were made smaller across the game.</li>
+        <li><b>Onboarding</b>: a "rewatch tutorial" button in the chip menu and new tutorials for healing and the down slam.</li>
+        <li><b>Critical bugs</b>: lost saves caused by antivirus software locking save files, and missing characters in Japanese, Chinese and Korean. The game launched in nine languages, and this was the one localization issue that blocked players.</li>
+      </ul>
+    </div>
+
+    <dl class="dgrid">
+      <dt>Result</dt>
+      <dd>Every report got an owner, a decision and a reply. Some reports were dismissed.  Players could see that we were listening, and the team only spent time on changes that mattered.</dd>
+    </dl>
+  </article>
+
+</section>
+
+<section id="gallery">
+  <h2>Screenshots</h2>
+  <div class="gallery">
+    <a href="https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2936080/278ff8272d9d30d01ce0e574e04c3feaaa1cc91f/ss_278ff8272d9d30d01ce0e574e04c3feaaa1cc91f.1920x1080.jpg" target="_blank" rel="noopener"><img src="https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2936080/278ff8272d9d30d01ce0e574e04c3feaaa1cc91f/ss_278ff8272d9d30d01ce0e574e04c3feaaa1cc91f.600x338.jpg" alt="ReSetna screenshot" loading="lazy"></a>
+    <a href="https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2936080/1153334cb15d268e2a857a2a8d4643312ae3d80d/ss_1153334cb15d268e2a857a2a8d4643312ae3d80d.1920x1080.jpg" target="_blank" rel="noopener"><img src="https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2936080/1153334cb15d268e2a857a2a8d4643312ae3d80d/ss_1153334cb15d268e2a857a2a8d4643312ae3d80d.600x338.jpg" alt="ReSetna screenshot" loading="lazy"></a>
+    <a href="https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2936080/354249ccf40abcbab6eb9d3d269f782d6c0765fa/ss_354249ccf40abcbab6eb9d3d269f782d6c0765fa.1920x1080.jpg" target="_blank" rel="noopener"><img src="https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2936080/354249ccf40abcbab6eb9d3d269f782d6c0765fa/ss_354249ccf40abcbab6eb9d3d269f782d6c0765fa.600x338.jpg" alt="ReSetna screenshot" loading="lazy"></a>
+    <a href="https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2936080/e945f485e66eee460c4ab0b9e5367af2d6e0e238/ss_e945f485e66eee460c4ab0b9e5367af2d6e0e238.1920x1080.jpg" target="_blank" rel="noopener"><img src="https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2936080/e945f485e66eee460c4ab0b9e5367af2d6e0e238/ss_e945f485e66eee460c4ab0b9e5367af2d6e0e238.600x338.jpg" alt="ReSetna screenshot" loading="lazy"></a>
+    <a href="https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2936080/190e5a5d519e124cc95f01d0b4cd1b976f86290d/ss_190e5a5d519e124cc95f01d0b4cd1b976f86290d.1920x1080.jpg" target="_blank" rel="noopener"><img src="https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2936080/190e5a5d519e124cc95f01d0b4cd1b976f86290d/ss_190e5a5d519e124cc95f01d0b4cd1b976f86290d.600x338.jpg" alt="ReSetna screenshot" loading="lazy"></a>
+    <a href="https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2936080/4c904d5c458aba10bf638f505a8dbb570dd66786/ss_4c904d5c458aba10bf638f505a8dbb570dd66786.1920x1080.jpg" target="_blank" rel="noopener"><img src="https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2936080/4c904d5c458aba10bf638f505a8dbb570dd66786/ss_4c904d5c458aba10bf638f505a8dbb570dd66786.600x338.jpg" alt="ReSetna screenshot" loading="lazy"></a>
+  </div>
+</section>
+
+<section id="landed">
+  <h2>How it landed</h2>
+  <div class="landed">
+    <div class="review-badge">
+      <span class="rb-label">Steam reviews</span>
+      <span class="rb-rating">Mostly Positive</span>
+      <span class="rb-detail">76% of 104 player reviews</span>
+    </div>
+    <div class="landed-text">
+      <p>ReSetna launched on Steam on 30 January 2025, and players liked it. It holds a Mostly Positive rating, with 76% of 104 reviews recommending it.</p>
+      <p>Sadly, it didn't sell well enough for the team to continue. Even so, I am extremely proud of what we delivered, and so is the whole team. We took a game from an empty project to a finished, well-reviewed release on Steam.</p>
+    </div>
+  </div>
+</section>
+
+<section id="takeaway">
+  <h2>What I took from it</h2>
+  <p class="intro">
+    ReSetna was the first project where I was responsible for everything at once: the team, the schedule, the investors and the talks with potential publishers.
+    On top of that, I was the only game designer on the project, so every feature, system and balancing change went through me while I was also running production.
+  </p>
+  <p class="intro">
+    Doing both jobs taught me that most production work is choosing what not to do. Dropping Early Access and feature locking bosses protected the parts of the game that mattered most, and being the designer meant I knew exactly what each cut would cost.
+  </p>
+  <p class="intro">
+    I also learned about listening to the team, and how to compromise on design decisions. With 15 people, everyone had an opinion on how the game should look and play, and the people building a feature usually knew best what it would take. I made a point of hearing them out before making a decision, and many of those discussions made the game better.
+  </p>
+  <p class="intro">
+    At the same time, not every decision could be a compromise. When something would hurt the player experience or put the deadline at risk, I had to make the final call and stand behind it, even when not everyone agreed. When we disagreed, I kept the discussion about the game and not about the person, and I always explained my reasoning, so the team understood why a decision was made even if they would have chosen differently.
+  </p>
+  <nav class="endnav">
+    <a class="btn btn-steam" href="https://store.steampowered.com/app/2936080/" target="_blank" rel="noopener"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M11.979 0C5.678 0 .511 4.86.022 11.037l6.432 2.658c.545-.371 1.203-.59 1.912-.59.063 0 .125.004.188.006l2.861-4.142V8.91c0-2.495 2.028-4.524 4.524-4.524 2.494 0 4.524 2.031 4.524 4.527s-2.03 4.525-4.524 4.525h-.105l-4.076 2.911c0 .052.004.105.004.159 0 1.875-1.515 3.396-3.39 3.396-1.635 0-3.016-1.173-3.331-2.727L.436 15.27C1.862 20.307 6.486 24 11.979 24c6.627 0 11.999-5.373 11.999-12S18.605 0 11.979 0zM7.54 18.21l-1.473-.61c.262.543.714.999 1.314 1.25 1.297.539 2.793-.076 3.332-1.375.263-.63.264-1.319.005-1.949s-.75-1.121-1.377-1.383c-.624-.26-1.29-.249-1.878-.03l1.523.63c.956.4 1.409 1.5 1.009 2.455-.397.957-1.497 1.41-2.454 1.012H7.54zm11.415-9.303c0-1.662-1.353-3.015-3.015-3.015-1.665 0-3.015 1.353-3.015 3.015 0 1.665 1.35 3.015 3.015 3.015 1.663 0 3.015-1.35 3.015-3.015zm-5.273-.005c0-1.252 1.013-2.266 2.265-2.266 1.249 0 2.266 1.014 2.266 2.266 0 1.251-1.017 2.265-2.266 2.265-1.253 0-2.265-1.014-2.265-2.265z"/></svg>Visit ReSetna on Steam</a>
+    <a class="btn btn-design" href="index.html"><span aria-hidden="true">&larr;</span>Back to portfolio</a>
+  </nav>
+</section>
+
+</main>
+
+<footer>
+  <p>Zagreb, Croatia · <a href="mailto:jakubi.ivan@gmail.com">jakubi.ivan@gmail.com</a></p>
+</footer>
+
+</body>
+</html>

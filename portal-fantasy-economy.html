@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Portal Fantasy: Game Economy Case Study - Ivan Jakubi</title>
+<meta name="description" content="How I designed the in-game economy systems of Portal Fantasy around its currencies and token: player roles that trade with each other, sinks and sources, Porble value and stat formulas, breeding, fusion and seasonal progression.">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="case-study.css">
+<script src="lightbox.js" defer></script>
+<script src="calc.js" defer></script>
+</head>
+<body class="cs">
+
+<nav class="cs-top">
+  <a href="index.html">&larr; Back to portfolio</a>
+  <a href="portal-fantasy-design.html">Game design case study &rarr;</a>
+</nav>
+
+<header class="cs-hero">
+  <p class="eyebrow"><svg class="eb-ico" viewBox="0 0 24 24" aria-hidden="true"><ellipse cx="9" cy="6.5" rx="5.5" ry="2.5"/><path d="M3.5 6.5v4c0 1.4 2.5 2.5 5.5 2.5s5.5-1.1 5.5-2.5v-4"/><path d="M3.5 10.5v4c0 1.4 2.5 2.5 5.5 2.5"/><ellipse cx="15" cy="14.5" rx="5.5" ry="2.5"/><path d="M9.5 14.5v3c0 1.4 2.5 2.5 5.5 2.5s5.5-1.1 5.5-2.5v-3"/></svg>Game economy case study</p>
+  <h1>Portal Fantasy</h1>
+  <p class="role">Game &amp; Economy Designer · Freelance · 2022–2024</p>
+
+  <figure class="cs-cover">
+    <img src="https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2464460/446bdd720140527c09f4a38c5ee1375cd323c9d6/ss_446bdd720140527c09f4a38c5ee1375cd323c9d6.1920x1080.jpg"
+         alt="Portal Fantasy Porble index screenshot" width="1920" height="1080">
+  </figure>
+
+  <p class="intro">
+    Portal Fantasy is a pixel-art creature collection RPG with a Web3 layer. It has its own token, PFT, and its creatures, the Porbles, can be moved onto the blockchain and traded. That makes the economy more than a balancing problem inside the game, because real value moves in and out of it.
+  </p>
+  <p class="intro">
+    The token and the currencies were set up by the team. My job was to design the game systems around them: how players earn and spend, how the different player roles trade with each other, what a Porble is worth and how that value is kept in check, and the seasonal progression that ties it all together. The battle system and the rest of the game design are covered in the <a href="portal-fantasy-design.html">game design case study</a>.
+  </p>
+
+  <dl class="facts">
+    <div><dt>Currencies</dt><dd>ORB, PFT, PFT Vouchers</dd></div>
+    <div><dt>My scope</dt><dd>In-game economy systems</dd></div>
+    <div><dt>Player roles</dt><dd>3</dd></div>
+    <div><dt>Season</dt><dd>3 months, 200 levels</dd></div>
+    <div><dt>Porbles</dt><dd>52, in 4 rarities</dd></div>
+    <div><dt>Tools</dt><dd>Google Sheets, Docs</dd></div>
+  </dl>
+</header>
+
+<main>
+
+<section id="economy">
+  <h2>Economy work</h2>
+
+  <!-- 01 -->
+  <article class="decision feature">
+    <p class="dnum">01</p>
+    <h3>Designing around three currencies</h3>
+    <dl class="dgrid">
+      <dt>The setup</dt>
+      <dd>The game came with three currencies, each with its own job. I didn't design them, but every system I built had to decide which one to use.</dd>
+      <dt>The rule I worked to</dt>
+      <dd>A player should be able to finish the whole game without ever touching the token. PFT is for players who want more, not a gate in front of the fun. Core progression runs on ORB, and PFT only shows up on options that save time or add something extra.</dd>
+    </dl>
+
+    <div class="bossgrid three">
+      <div class="bcard"><p class="bh">ORB</p><p>The everyday currency. It lives off-chain, has no cap, and comes from battles, quests and chests. It buys potions, scrolls, bombs and most map pieces, and it's what every player spends day to day.</p></div>
+      <div class="bcard"><p class="bh">PFT</p><p>The token. It lives on-chain, is capped at 1 billion and is released slowly over time. It pays for the premium options: refilling mana, Fusion, breeding, rare map pieces, cosmetics and staking.</p></div>
+      <div class="bcard"><p class="bh">PFT Vouchers</p><p>Earned in the game and swapped for PFT at a rate the team sets. They can't be spent on anything else.</p></div>
+    </div>
+
+    <dl class="dgrid">
+      <dt>Why vouchers helped</dt>
+      <dd>Vouchers made my side much easier. Because the team controlled the exchange rate, the real value of a reward could change without me rebalancing every quest. Players also didn't have to connect a wallet and approve a transaction every time they earned a little PFT.</dd>
+    </dl>
+
+    <div class="table-wrap">
+      <table class="cs-table">
+        <thead><tr><th>Where it comes from</th><th>Currency</th><th>Where it goes</th><th>Currency</th></tr></thead>
+        <tbody>
+          <tr><td>Quests</td><td>ORB, Vouchers in events</td><td>Potions, bombs, capture scrolls</td><td>ORB</td></tr>
+          <tr><td>Chests, hidden items, NPCs</td><td>ORB, Vouchers</td><td>Refilling mana</td><td>PFT</td></tr>
+          <tr><td>Beating trainers and wild Porbles</td><td>ORB</td><td>Breeding and Fusion</td><td>PFT</td></tr>
+          <tr><td>Marketing campaigns</td><td>Vouchers, PFT</td><td>Pets and cosmetics</td><td>PFT, rarely ORB</td></tr>
+          <tr><td></td><td></td><td>Architect map pieces and traps</td><td>Mostly ORB, PFT for rare ones</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </article>
+
+  <!-- 02 -->
+  <article class="decision feature">
+    <p class="dnum">02</p>
+    <h3>Three kinds of players who need each other</h3>
+    <dl class="dgrid">
+      <dt>The problem</dt>
+      <dd>In most play-and-earn games, every player does the same thing and sells the same thing, so everyone is a seller and nobody is a buyer. I wanted players to specialise, so that what one player makes is exactly what another one needs.</dd>
+    </dl>
+
+    <div class="diagram">
+      <p class="scores-title">How value moves between the roles</p>
+      <svg class="roleloop" viewBox="0 0 600 330" role="img" aria-label="Heroes sell ingredients to Architects and gear to Competitive players. Architects sell map access and rare ingredients to Heroes. Competitive players sell Scarab fragments and prizes to Heroes.">
+        <defs>
+          <marker id="ra" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+            <path d="M0 0 L10 5 L0 10 z" fill="#d8703f"/>
+          </marker>
+        </defs>
+        <!-- Heroes top center, Architects bottom left, Competitive bottom right -->
+        <path d="M245 92 Q150 130 120 220" class="ra" marker-end="url(#ra)"/>
+        <path d="M160 238 Q215 150 262 104" class="ra" marker-end="url(#ra)"/>
+        <path d="M355 92 Q450 130 480 220" class="ra" marker-end="url(#ra)"/>
+        <path d="M440 238 Q385 150 338 104" class="ra" marker-end="url(#ra)"/>
+        <g class="rnode"><rect x="230" y="40" width="140" height="56" rx="10"/><text x="300" y="66">Heroes</text><text x="300" y="84" class="rsub">play the story, craft</text></g>
+        <g class="rnode"><rect x="40" y="222" width="160" height="56" rx="10"/><text x="120" y="248">Architects</text><text x="120" y="266" class="rsub">build maps</text></g>
+        <g class="rnode"><rect x="400" y="222" width="160" height="56" rx="10"/><text x="480" y="248">Competitive</text><text x="480" y="266" class="rsub">tournaments</text></g>
+        <text x="122" y="150" class="rlab">ingredients</text>
+        <text x="252" y="246" class="rlab">rare ingredients,</text>
+        <text x="252" y="261" class="rlab">map access</text>
+        <text x="478" y="150" class="rlab">tickets, augmentations</text>
+        <text x="350" y="246" class="rlab">Scarabs,</text>
+        <text x="350" y="261" class="rlab">prizes</text>
+        <text x="300" y="318" class="el-cap">PFT flows the opposite way to the goods</text>
+      </svg>
+    </div>
+
+    <dl class="dgrid">
+      <dt>Heroes</dt>
+      <dd>Heroes play the story. Recipes can only be learned on story maps and can't be bought or sold, which makes Heroes the crafters. They break Porbles down for ingredients and turn them into augmentations, dyes and tournament tickets to sell.</dd>
+      <dt>Architects</dt>
+      <dd>Architects own land and build their own maps. They buy ingredients from Heroes in bulk to grow rare ones that only exist on Architect maps, and the more lush their gardens, the rarer the Porbles they attract. Legendary Porbles can only be found there.</dd>
+      <dt>Competitive players</dt>
+      <dd>Competitive players pay to enter tournaments and play for PFT and items. Rather than grinding the story, they buy tuned Porbles, augmentations and tickets from Heroes. Their prizes include Scarab fragments, which Heroes need to enter the best Architect maps, and that closes the loop.</dd>
+      <dt>Paying Architects fairly</dt>
+      <dd>A Hero pays 15 mana up front to enter an Architect map. The first 5 are always spent, with 1 going to us and 4 to the Architect. After that, the mana drains at 1 per minute, and the Architect earns for every minute the Hero stays. A map that's too easy gets emptied and abandoned, so Architects are pushed to hide their rare ingredients behind puzzles, traps and quests, which makes better content for everyone.</dd>
+    </dl>
+  </article>
+
+  <figure class="cs-shot">
+    <img src="https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2464460/1c6782b2892e9d69c6667b20ecb2655197856c27/ss_1c6782b2892e9d69c6667b20ecb2655197856c27.1920x1080.jpg"
+         alt="Portal Fantasy screenshot" loading="lazy" width="1920" height="1080">
+  </figure>
+
+  <!-- 03 -->
+  <article class="decision feature">
+    <p class="dnum">03</p>
+    <h3>Sinks and sources around the token</h3>
+    <dl class="dgrid">
+      <dt>The challenge</dt>
+      <dd>The hardest part of any token economy is making sure tokens don't flow out faster than they come back in. If they do, the token loses value, and the players who earned it lose interest. The token rules came from the team: all PFT spent in the game is burned, and withdrawals have a minimum. My part was the game systems that decide where PFT comes from and where it goes.</dd>
+      <dt>Sinks</dt>
+      <dd>I tied the sinks to things players already want. They can wake a Porble from Deep Sleep early, at a price based on how long it has left, buy Time Tablets to cut crafting timers, refresh daily quests once the free refreshes run out, and pay to enter Architect maps.</dd>
+      <dt>Sources</dt>
+      <dd>Rewards are tied to actual play. Every daily quest gives experience, but only some give PFT, and those show "up to X PFT" so the final amount depends on how well the player does. Players who stake PFT get a better chance at PFT quests, plus an experience boost.</dd>
+      <dt>Working with the limits</dt>
+      <dd>Withdrawals have a minimum of 1,000 PFT and a 7-day wait. I paced the in-game rewards around that, so players reach the minimum through steady play and always have something useful to spend on along the way.</dd>
+    </dl>
+
+    <div class="table-wrap">
+      <table class="cs-table">
+        <thead><tr><th>Vault store item</th><th>Price</th><th>What it does</th></tr></thead>
+        <tbody>
+          <tr><td>Time Tablet</td><td>50 PFT</td><td>Cuts a crafting or Fusion timer by a minute</td></tr>
+          <tr><td>Awake Potion</td><td>200 PFT</td><td>Wakes a Porble from Deep Sleep</td></tr>
+          <tr><td>Capture-o-Matic Scroll</td><td>300 PFT</td><td>The best capture scroll</td></tr>
+          <tr><td>Coffers</td><td>500–1,000 PFT</td><td>Opened with keys found in the game, never sold</td></tr>
+          <tr><td>Cosmetics</td><td>500–5,000 PFT</td><td>Four tiers</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="diag-note">Example prices, worked out for a starting PFT value of about 0.1 USD.</p>
+  </article>
+
+  <!-- 04 -->
+  <article class="decision">
+    <p class="dnum">04</p>
+    <h3>Events as the steering wheel</h3>
+    <dl class="dgrid">
+      <dt>The idea</dt>
+      <dd>No economy plan survives contact with real players. I wanted a way to fix imbalances quickly, without patching the game.</dd>
+      <dt>How it works</dt>
+      <dd>Tournaments and events were built from templates, with settings for minimum players, entry fee, team size, Majesty level, required tickets and how the prize pool is split. Entry fees ranged from free to 1,000 PFT, our own prize pools from 200 to 5,000 PFT, and we took a cut from every paid tournament. Some events ran several times a day, others daily, weekly or monthly.</dd>
+      <dt>Using them</dt>
+      <dd>Each event targets one weak spot in the cycle. If a role is under-played, an event pushes players into it. If a mechanic was just fixed, an event brings players back to try it. If too much PFT is being sold, a high-stakes tournament gives holders a reason to play with it instead, and if too little is in circulation, a cheap event hands some out.</dd>
+    </dl>
+  </article>
+
+  <!-- 05 -->
+  <article class="decision feature">
+    <p class="dnum">05</p>
+    <h3>What a Porble is worth</h3>
+    <dl class="dgrid">
+      <dt>The idea</dt>
+      <dd>When Porbles can be owned and traded on chain, every Porble needs a value players can understand. No two Porbles of the same species should be exactly equal, and rare ones have to stay rare.</dd>
+    </dl>
+
+    <div class="diagram">
+      <p class="scores-title">A few of the Porbles, by rarity</p>
+      <div class="roster">
+        <div class="porble r-common"><span class="pimg"><img src="img/porbles/toadshroom.png" alt="Toadshroom" loading="lazy"></span><span class="pname">Toadshroom</span><span class="ptag">Common · Gaia</span></div>
+        <div class="porble r-common"><span class="pimg"><img src="img/porbles/leobat.png" alt="Leobat" loading="lazy"></span><span class="pname">Leobat</span><span class="ptag">Common · Light</span></div>
+        <div class="porble r-common"><span class="pimg"><img src="img/porbles/shocpion.png" alt="Shocpion" loading="lazy"></span><span class="pname">Shocpion</span><span class="ptag">Common · Lightning</span></div>
+        <div class="porble r-common"><span class="pimg"><img src="img/porbles/boablaze.png" alt="Boablaze" loading="lazy"></span><span class="pname">Boablaze</span><span class="ptag">Common · Fire</span></div>
+        <div class="porble r-uncommon"><span class="pimg"><img src="img/porbles/lizord.png" alt="Lizord" loading="lazy"></span><span class="pname">Lizord</span><span class="ptag">Uncommon · Gaia</span></div>
+        <div class="porble r-uncommon"><span class="pimg"><img src="img/porbles/hexadillo.png" alt="Hexadillo" loading="lazy"></span><span class="pname">Hexadillo</span><span class="ptag">Uncommon · Dark</span></div>
+        <div class="porble r-uncommon"><span class="pimg"><img src="img/porbles/abunibus.png" alt="Abunibus" loading="lazy"></span><span class="pname">Abunibus</span><span class="ptag">Uncommon · Lightning</span></div>
+        <div class="porble r-rare"><span class="pimg"><img src="img/porbles/groobeet.png" alt="Groobeet" loading="lazy"></span><span class="pname">Groobeet</span><span class="ptag">Rare · Gaia</span></div>
+        <div class="porble r-rare"><span class="pimg"><img src="img/porbles/sparlin.png" alt="Sparlin" loading="lazy"></span><span class="pname">Sparlin</span><span class="ptag">Rare · Light</span></div>
+        <div class="porble r-rare"><span class="pimg"><img src="img/porbles/charpup.png" alt="Charpup" loading="lazy"></span><span class="pname">Charpup</span><span class="ptag">Rare · Fire</span></div>
+      </div>
+    </div>
+
+    <dl class="dgrid">
+      <dt>Four layers of value</dt>
+      <dd>
+        Every Porble's stats are built in four layers. <b class="hl2">Base stats</b> are set per species across six stats, and their total decides the species' rarity. <b class="hl2">Innate Talent</b> is rolled when a Porble is caught, from 1 to 10 per stat, so two Porbles of the same species can turn out very different. <b class="hl2">Training Discipline</b> is what the player adds through training. Finally, one of nine <b class="hl2">personalities</b> raises some stats by up to 20% and lowers others by 10%, so a Shy Porble, for example, has more health but less attack.
+      </dd>
+    </dl>
+
+    <div class="rarity-bands">
+      <div class="rb c"><span class="rn">Common</span><span class="rr">100–200</span></div>
+      <div class="rb u"><span class="rn">Uncommon</span><span class="rr">201–300</span></div>
+      <div class="rb r"><span class="rn">Rare</span><span class="rr">301–400</span></div>
+      <div class="rb l"><span class="rn">Legendary</span><span class="rr">401–500</span></div>
+    </div>
+    <p class="diag-note">Total base stats per species, and the rarity it puts the species in.</p>
+
+    <dl class="dgrid">
+      <dt>Rarity drives everything</dt>
+      <dd>Rarity feeds into every other system. Rarer Porbles give more experience and ORB when beaten, but they also need more experience to level up. At level 20, a Common has needed 6,000 experience in total, while a Legendary has needed 11,200. Rarer Porbles also sleep longer after a knockout, cost more to breed and need more points to grow through Fusion.</dd>
+      <dt>Placing them in the world</dt>
+      <dd>I tracked every Porble by biome, map, chapter, rarity and element in a single sheet. Of the 52 Porbles in the game at that point, 22 were Common, 17 Uncommon and 13 Rare, with Legendaries saved for Architect maps. Every element had between 7 and 10 Porbles, so none of them was left short.</dd>
+    </dl>
+  </article>
+
+  <!-- 06 -->
+  <article class="decision feature">
+    <p class="dnum">06</p>
+    <h3>The stat formulas</h3>
+    <dl class="dgrid">
+      <dt>The idea</dt>
+      <dd>Every number a player sees on a Porble comes from the same two formulas. I built them in one sheet, so changing a single value would update every Porble in the game at once.</dd>
+      <dt>Six stats</dt>
+      <dd><b class="hl2">Constitution</b> sets health, <b class="hl2">Vigor</b> attack, <b class="hl2">Tenacity</b> defence, <b class="hl2">Spirit</b> special attack, <b class="hl2">Fortitude</b> special defence and <b class="hl2">Dexterity</b> attack speed. Levels go from 1 to 100.</dd>
+    </dl>
+
+    <div class="table-wrap">
+      <table class="cs-table">
+        <thead><tr><th>Input</th><th>Range</th><th>Where it comes from</th></tr></thead>
+        <tbody>
+          <tr><td>Base stat</td><td>5–100 per stat</td><td>Fixed per species. The total of all six decides the rarity.</td></tr>
+          <tr><td>Innate Talent (IT)</td><td>1–10 per stat, 60 total</td><td>Rolled when the Porble is caught or bred. Raised later through Fusion.</td></tr>
+          <tr><td>Training Discipline (TD)</td><td>1–80 per stat, 186 total</td><td>Added by the player with consumable items. The total cap means a Porble can't be maxed in everything.</td></tr>
+          <tr><td>Personality</td><td>0.9–1.2 per stat</td><td>Rolled when caught or bred, never changes.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="formula">
+      <p class="fname">Health</p>
+      <p class="feq">HP = ( (Base + IT + TD / 8) &times; Level / 50 + Level + 10 ) &times; Personality &times; 2</p>
+      <p class="fname">Every other stat</p>
+      <p class="feq">Stat = ( (4 &times; Base + IT + TD / 8) &times; Level / 150 + 10 ) &times; Personality</p>
+    </div>
+
+    <dl class="dgrid">
+      <dt>Why these weights</dt>
+      <dd>In the stat formula, the base stat counts four times, so the species always decides what a Porble is good at. IT adds up to 10 points, enough to make two Porbles of the same species feel different without turning a weak species into a strong one. TD only counts one point for every eight, because it's the slow, long-term part the player builds over time. The flat +10 stops low-level stats from sitting at zero. Health has its own formula that also grows with level, so fights get longer as Porbles level up instead of staying the same length.</dd>
+      <dt>Worked example</dt>
+      <dd>Charpup has a base Vigor of 90. With an IT of 7, a TD of 40 and a Combative personality (1.1 on Vigor), at level 50 its attack is ((4 &times; 90 + 7 + 40 / 8) &times; 50 / 150 + 10) &times; 1.1 = <b class="hl2">147</b>. The same Charpup with a Shy personality (0.9 on Vigor) would have 121.</dd>
+    </dl>
+
+    <div class="calc" id="calc">
+      <p class="scores-title">Try it: the stat calculator</p>
+      <div class="calc-in">
+        <label>Porble<select id="c-p"></select></label>
+        <label>Personality<select id="c-n"></select></label>
+        <label>Level <output id="c-lv-o">50</output><input type="range" id="c-lv" min="1" max="100" value="50"></label>
+        <label>IT per stat <output id="c-it-o">5</output><input type="range" id="c-it" min="1" max="10" value="5"></label>
+        <label>TD per stat <output id="c-td-o">0</output><input type="range" id="c-td" min="0" max="31" value="0"></label>
+      </div>
+      <div class="calc-out" id="c-out"></div>
+      <p class="diag-note" id="c-meta"></p>
+    </div>
+  </article>
+
+  <!-- 07 -->
+  <article class="decision feature">
+    <p class="dnum">07</p>
+    <h3>Personalities change the shape, not the power</h3>
+    <dl class="dgrid">
+      <dt>The rule</dt>
+      <dd>A personality should make a Porble different, never simply better. If one personality were strictly stronger, every player would chase it, and all the others would become worthless on the market.</dd>
+      <dt>How I kept it fair</dt>
+      <dd>Each of the nine personalities multiplies the six stats, and every row adds up to exactly 6. Whatever a personality gives to one stat, it takes away from another.</dd>
+    </dl>
+    <div class="table-wrap">
+      <table class="cs-table ptable">
+        <thead><tr><th>Personality</th><th>Con</th><th>Vig</th><th>Ten</th><th>Spi</th><th>For</th><th>Dex</th></tr></thead>
+        <tbody>
+          <tr><th>Balanced</th><td class="">1</td><td class="">1</td><td class="">1</td><td class="">1</td><td class="">1</td><td class="">1</td></tr>
+          <tr><th>Combative</th><td class="">1</td><td class="up">1.1</td><td class="dn">0.9</td><td class="">1</td><td class="dn">0.9</td><td class="up">1.1</td></tr>
+          <tr><th>Shy</th><td class="up">1.2</td><td class="dn">0.9</td><td class="">1</td><td class="dn">0.9</td><td class="">1</td><td class="">1</td></tr>
+          <tr><th>Intuitive</th><td class="">1</td><td class="dn">0.9</td><td class="dn">0.9</td><td class="up">1.1</td><td class="up">1.1</td><td class="">1</td></tr>
+          <tr><th>Fortuitous</th><td class="up">1.1</td><td class="dn">0.9</td><td class="up">1.1</td><td class="dn">0.9</td><td class="up">1.1</td><td class="dn">0.9</td></tr>
+          <tr><th>Primitive</th><td class="">1</td><td class="up">1.1</td><td class="dn">0.9</td><td class="dn">0.9</td><td class="dn">0.9</td><td class="up">1.2</td></tr>
+          <tr><th>Witty</th><td class="dn">0.9</td><td class="">1</td><td class="">1</td><td class="up">1.1</td><td class="">1</td><td class="">1</td></tr>
+          <tr><th>Compassionate</th><td class="up">1.1</td><td class="dn">0.9</td><td class="up">1.1</td><td class="">1</td><td class="">1</td><td class="dn">0.9</td></tr>
+          <tr><th>Patient</th><td class="dn">0.9</td><td class="dn">0.9</td><td class="">1</td><td class="up">1.2</td><td class="">1</td><td class="">1</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="diag-note">Stat multipliers per personality. Every row sums to 6.</p>
+  </article>
+
+  <!-- 08 -->
+  <article class="decision feature">
+    <p class="dnum">08</p>
+    <h3>Experience: what a Porble gives and what it needs</h3>
+    <dl class="dgrid">
+      <dt>What it gives</dt>
+      <dd>Each species has a base experience value, based on its base stat total and its rarity. Rarer species are worth more per stat point.</dd>
+    </dl>
+    <div class="formula">
+      <p class="fname">Base experience</p>
+      <p class="feq">Base EXP = Total base stats &times; R / 20, &nbsp; R = 4 Common, 6 Uncommon, 8 Rare, 10 Legendary</p>
+      <p class="fname">Experience gained from a battle</p>
+      <p class="feq">EXP = Base EXP &times; L<sub>enemy</sub> / 5 &times; ( (2 &times; L<sub>enemy</sub> + 10) / (L<sub>enemy</sub> + L<sub>own</sub> + 10) )<sup>4.5</sup> &times; Source</p>
+    </div>
+    <dl class="dgrid">
+      <dt>How the gain works</dt>
+      <dd>The first part scales with the enemy's level. The second part compares the two levels: beating something stronger pays off quickly, while beating something weaker drops off steeply because of the 4.5 power. On top of that, a Porble 10 or more levels above its opponent gets nothing, which closed the farming exploit found in playtests. Finally, the source multiplier pays 1x for defeating a wild Porble, 1.1x for capturing one and 1.2x for beating another trainer's Porble, so harder fights pay more.</dd>
+      <dt>What it needs</dt>
+      <dd>Each rarity levels on its own curve. Common, Uncommon and Legendary follow simple cubic curves. Rare uses a curve that is expensive for the first few levels, eases off in the teens and then climbs past Uncommon, so a freshly caught Rare has a short hump to get over before it starts to pay off.</dd>
+    </dl>
+    <div class="diagram">
+      <p class="scores-title">Total experience needed, by level</p>
+      <svg class="expchart" viewBox="0 0 600 300" role="img" aria-label="Total experience needed per level for each rarity, from level 1 to 100.">
+<line x1="60" x2="580" y1="260.0" y2="260.0" class="grid"/><text x="52" y="264.0" class="ax" text-anchor="end">0</text>
+<line x1="60" x2="580" y1="200.0" y2="200.0" class="grid"/><text x="52" y="204.0" class="ax" text-anchor="end">350k</text>
+<line x1="60" x2="580" y1="140.0" y2="140.0" class="grid"/><text x="52" y="144.0" class="ax" text-anchor="end">700k</text>
+<line x1="60" x2="580" y1="80.0" y2="80.0" class="grid"/><text x="52" y="84.0" class="ax" text-anchor="end">1.1M</text>
+<line x1="60" x2="580" y1="20.0" y2="20.0" class="grid"/><text x="52" y="24.0" class="ax" text-anchor="end">1.4M</text>
+<text x="60.0" y="278" class="ax" text-anchor="middle">1</text>
+<text x="186.1" y="278" class="ax" text-anchor="middle">25</text>
+<text x="317.4" y="278" class="ax" text-anchor="middle">50</text>
+<text x="448.7" y="278" class="ax" text-anchor="middle">75</text>
+<text x="580.0" y="278" class="ax" text-anchor="middle">100</text>
+<text x="320.0" y="296" class="ax" text-anchor="middle">Level</text>
+<polyline points="60.0,260.0 65.3,260.0 70.5,260.0 75.8,260.0 81.0,260.0 86.3,260.0 91.5,260.0 96.8,259.9 102.0,259.9 107.3,259.9 112.5,259.8 117.8,259.8 123.0,259.7 128.3,259.6 133.5,259.6 138.8,259.5 144.0,259.4 149.3,259.3 154.5,259.1 159.8,259.0 165.1,258.8 170.3,258.6 175.6,258.4 180.8,258.2 186.1,258.0 191.3,257.7 196.6,257.5 201.8,257.2 207.1,256.9 212.3,256.5 217.6,256.2 222.8,255.8 228.1,255.4 233.3,254.9 238.6,254.5 243.8,254.0 249.1,253.5 254.3,252.9 259.6,252.4 264.8,251.8 270.1,251.1 275.4,250.5 280.6,249.8 285.9,249.0 291.1,248.3 296.4,247.5 301.6,246.7 306.9,245.8 312.1,244.9 317.4,243.9 322.6,242.9 327.9,241.9 333.1,240.9 338.4,239.8 343.6,238.6 348.9,237.4 354.1,236.2 359.4,234.9 364.6,233.6 369.9,232.2 375.2,230.8 380.4,229.4 385.7,227.9 390.9,226.3 396.2,224.7 401.4,223.0 406.7,221.3 411.9,219.6 417.2,217.8 422.4,215.9 427.7,214.0 432.9,212.0 438.2,210.0 443.4,207.9 448.7,205.8 453.9,203.6 459.2,201.3 464.4,199.0 469.7,196.6 474.9,194.2 480.2,191.7 485.5,189.1 490.7,186.5 496.0,183.8 501.2,181.0 506.5,178.2 511.7,175.3 517.0,172.4 522.2,169.4 527.5,166.3 532.7,163.1 538.0,159.9 543.2,156.6 548.5,153.2 553.7,149.8 559.0,146.2 564.2,142.7 569.5,139.0 574.7,135.2 580.0,131.4" fill="none" stroke="#b9bcc4" stroke-width="2.5"/>
+<polyline points="60.0,260.0 65.3,260.0 70.5,260.0 75.8,260.0 81.0,260.0 86.3,260.0 91.5,259.9 96.8,259.9 102.0,259.9 107.3,259.8 112.5,259.8 117.8,259.7 123.0,259.6 128.3,259.5 133.5,259.4 138.8,259.3 144.0,259.2 149.3,259.0 154.5,258.8 159.8,258.6 165.1,258.4 170.3,258.2 175.6,257.9 180.8,257.6 186.1,257.3 191.3,257.0 196.6,256.6 201.8,256.2 207.1,255.8 212.3,255.4 217.6,254.9 222.8,254.4 228.1,253.8 233.3,253.3 238.6,252.7 243.8,252.0 249.1,251.3 254.3,250.6 259.6,249.8 264.8,249.0 270.1,248.2 275.4,247.3 280.6,246.4 285.9,245.4 291.1,244.4 296.4,243.3 301.6,242.2 306.9,241.0 312.1,239.8 317.4,238.6 322.6,237.3 327.9,235.9 333.1,234.5 338.4,233.0 343.6,231.5 348.9,229.9 354.1,228.3 359.4,226.6 364.6,224.8 369.9,223.0 375.2,221.1 380.4,219.1 385.7,217.1 390.9,215.1 396.2,212.9 401.4,210.7 406.7,208.4 411.9,206.1 417.2,203.7 422.4,201.2 427.7,198.6 432.9,196.0 438.2,193.3 443.4,190.5 448.7,187.7 453.9,184.7 459.2,181.7 464.4,178.6 469.7,175.5 474.9,172.2 480.2,168.9 485.5,165.5 490.7,162.0 496.0,158.4 501.2,154.7 506.5,151.0 511.7,147.1 517.0,143.2 522.2,139.1 527.5,135.0 532.7,130.8 538.0,126.5 543.2,122.1 548.5,117.6 553.7,113.0 559.0,108.3 564.2,103.5 569.5,98.7 574.7,93.7 580.0,88.6" fill="none" stroke="#6cc287" stroke-width="2.5"/>
+<polyline points="60.0,260.0 65.3,260.0 70.5,260.0 75.8,260.0 81.0,260.0 86.3,259.9 91.5,259.9 96.8,259.9 102.0,259.9 107.3,259.8 112.5,259.8 117.8,259.7 123.0,259.6 128.3,259.6 133.5,259.5 138.8,259.3 144.0,259.2 149.3,259.1 154.5,258.9 159.8,258.7 165.1,258.5 170.3,258.2 175.6,258.0 180.8,257.7 186.1,257.3 191.3,257.0 196.6,256.6 201.8,256.2 207.1,255.7 212.3,255.2 217.6,254.7 222.8,254.2 228.1,253.6 233.3,252.9 238.6,252.2 243.8,251.5 249.1,250.7 254.3,249.9 259.6,249.1 264.8,248.1 270.1,247.2 275.4,246.2 280.6,245.1 285.9,244.0 291.1,242.8 296.4,241.6 301.6,240.3 306.9,238.9 312.1,237.5 317.4,236.0 322.6,234.5 327.9,232.8 333.1,231.2 338.4,229.4 343.6,227.6 348.9,225.7 354.1,223.8 359.4,221.7 364.6,219.6 369.9,217.4 375.2,215.2 380.4,212.8 385.7,210.4 390.9,207.9 396.2,205.3 401.4,202.7 406.7,199.9 411.9,197.1 417.2,194.1 422.4,191.1 427.7,188.0 432.9,184.8 438.2,181.5 443.4,178.1 448.7,174.6 453.9,171.0 459.2,167.3 464.4,163.5 469.7,159.6 474.9,155.6 480.2,151.5 485.5,147.3 490.7,143.0 496.0,138.6 501.2,134.0 506.5,129.4 511.7,124.6 517.0,119.7 522.2,114.7 527.5,109.6 532.7,104.4 538.0,99.0 543.2,93.5 548.5,87.9 553.7,82.2 559.0,76.4 564.2,70.4 569.5,64.3 574.7,58.1 580.0,51.7" fill="none" stroke="#5fa3e6" stroke-width="2.5"/>
+<polyline points="60.0,260.0 65.3,260.0 70.5,260.0 75.8,260.0 81.0,260.0 86.3,259.9 91.5,259.9 96.8,259.9 102.0,259.8 107.3,259.8 112.5,259.7 117.8,259.6 123.0,259.5 128.3,259.3 133.5,259.2 138.8,259.0 144.0,258.8 149.3,258.6 154.5,258.4 159.8,258.1 165.1,257.8 170.3,257.4 175.6,257.1 180.8,256.7 186.1,256.2 191.3,255.8 196.6,255.3 201.8,254.7 207.1,254.1 212.3,253.5 217.6,252.9 222.8,252.1 228.1,251.4 233.3,250.6 238.6,249.7 243.8,248.8 249.1,247.8 254.3,246.8 259.6,245.8 264.8,244.6 270.1,243.5 275.4,242.2 280.6,240.9 285.9,239.6 291.1,238.1 296.4,236.6 301.6,235.1 306.9,233.5 312.1,231.8 317.4,230.0 322.6,228.2 327.9,226.3 333.1,224.3 338.4,222.2 343.6,220.1 348.9,217.9 354.1,215.6 359.4,213.2 364.6,210.7 369.9,208.2 375.2,205.5 380.4,202.8 385.7,200.0 390.9,197.1 396.2,194.1 401.4,191.0 406.7,187.8 411.9,184.5 417.2,181.2 422.4,177.7 427.7,174.1 432.9,170.4 438.2,166.6 443.4,162.7 448.7,158.8 453.9,154.6 459.2,150.4 464.4,146.1 469.7,141.7 474.9,137.1 480.2,132.5 485.5,127.7 490.7,122.8 496.0,117.8 501.2,112.6 506.5,107.3 511.7,102.0 517.0,96.4 522.2,90.8 527.5,85.0 532.7,79.1 538.0,73.1 543.2,67.0 548.5,60.7 553.7,54.2 559.0,47.7 564.2,41.0 569.5,34.1 574.7,27.1 580.0,20.0" fill="none" stroke="#e6b04a" stroke-width="2.5"/>
+<line x1="76" x2="94" y1="30" y2="30" stroke="#e6b04a" stroke-width="3"/><text x="100" y="34" class="ax">Legendary</text>
+<line x1="76" x2="94" y1="48" y2="48" stroke="#5fa3e6" stroke-width="3"/><text x="100" y="52" class="ax">Rare</text>
+<line x1="76" x2="94" y1="66" y2="66" stroke="#6cc287" stroke-width="3"/><text x="100" y="70" class="ax">Uncommon</text>
+<line x1="76" x2="94" y1="84" y2="84" stroke="#b9bcc4" stroke-width="3"/><text x="100" y="88" class="ax">Common</text>
+</svg>
+    </div>
+    <div class="table-wrap">
+      <table class="cs-table">
+        <thead><tr><th>Rarity</th><th>Curve</th><th>Level 10</th><th>Level 50</th><th>Level 100</th></tr></thead>
+        <tbody>
+          <tr><td>Common</td><td>0.75 &times; L&sup3;</td><td>750</td><td>93,750</td><td>750,000</td></tr>
+          <tr><td>Uncommon</td><td>L&sup3;</td><td>1,000</td><td>125,000</td><td>1,000,000</td></tr>
+          <tr><td>Rare</td><td>4/3 L&sup3; &minus; 13 L&sup2; + 120 L &minus; 190</td><td>1,043</td><td>139,977</td><td>1,215,143</td></tr>
+          <tr><td>Legendary</td><td>1.4 &times; L&sup3;</td><td>1,400</td><td>175,000</td><td>1,400,000</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <dl class="dgrid">
+      <dt>ORB rewards</dt>
+      <dd>Beating a Porble also pays ORB, multiplied by its rarity: 1x for Common, 1.3x for Uncommon, 1.5x for Rare and 2x for Legendary. Rare fights are worth seeking out, but not so much that players ignore everything else.</dd>
+    </dl>
+  </article>
+
+  <!-- 09 -->
+  <article class="decision">
+    <p class="dnum">09</p>
+    <h3>The battle numbers</h3>
+    <dl class="dgrid">
+      <dt>Element damage</dt>
+      <dd>Special attacks are multiplied by the element matchup. Each element also resists itself, so a Fire Porble using a Fire attack on another Fire Porble only deals half.</dd>
+    </dl>
+    <div class="table-wrap">
+      <table class="cs-table etable">
+        <thead><tr><th>Attacker &darr; / Defender &rarr;</th><th>Fire</th><th>Water</th><th>Lightning</th><th>Gaia</th><th>Dark</th><th>Light</th></tr></thead>
+        <tbody>
+          <tr><th>Fire</th><td class="dn">0.5x</td><td class="dn">0.5x</td><td>1x</td><td class="up">2x</td><td>1x</td><td>1x</td></tr>
+          <tr><th>Water</th><td class="up">2x</td><td class="dn">0.5x</td><td class="dn">0.5x</td><td>1x</td><td>1x</td><td>1x</td></tr>
+          <tr><th>Lightning</th><td>1x</td><td class="up">2x</td><td class="dn">0.5x</td><td class="dn">0.5x</td><td>1x</td><td>1x</td></tr>
+          <tr><th>Gaia</th><td class="dn">0.5x</td><td>1x</td><td class="up">2x</td><td class="dn">0.5x</td><td>1x</td><td>1x</td></tr>
+          <tr><th>Dark</th><td>1x</td><td>1x</td><td>1x</td><td>1x</td><td class="dn">0.5x</td><td class="up">2x</td></tr>
+          <tr><th>Light</th><td>1x</td><td>1x</td><td>1x</td><td>1x</td><td class="up">2x</td><td class="dn">0.5x</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <dl class="dgrid">
+      <dt>Momentum per hit</dt>
+      <dd>The Momentum a Porble gains per hit depends on its base Spirit or Fortitude: 4 for a base of 5–25, 5 for 26–50, 6 for 51–75 and 7 for 76–100. Magic-heavy Porbles reach their special attacks sooner. Players can only boost this for a while through passives and items, never permanently, and every Porble's Momentum pool is 20.</dd>
+      <dt>Crits and status effects</dt>
+      <dd>Crit chance is a flat 5% for every Porble, and it can only be raised for a while through passives and items. A separate multiplier grows with the number of status effects in play, from 1.1 for one effect up to 1.5 for five.</dd>
+      <dt>Special attack slots</dt>
+      <dd>Every Porble starts with one special attack slot, unlocks a second at level 15 and a third at level 30, so new players learn one attack at a time.</dd>
+      <dt>Enemy builds</dt>
+      <dd>Wild and rogue Porbles have their special attacks rolled based on level. Up to level 15, they get one attack of one element, with a power of 40 at most. Up to level 29, they get two attacks from two elements, with up to 70 power. From level 30 they get three attacks with no power cap, and from level 46 those can come from three elements. Enemy AI picks one of three profiles based on its base Spirit or Fortitude: Bruiser for 5–35, Strategist for 36–65 and Caster for 66–100.</dd>
+      <dt>Capture scrolls</dt>
+      <dd>Scrolls multiply the catch chance by 1.2, 1.4, 1.6 and 1.8, and the best one is a guaranteed catch.</dd>
+    </dl>
+  </article>
+
+  <!-- 10 -->
+  <article class="decision feature">
+    <p class="dnum">10</p>
+    <h3>Breeding with a built-in limit</h3>
+    <dl class="dgrid">
+      <dt>The problem</dt>
+      <dd>If players can make new Porbles, they can also flood the market with them. Breeding had to feel rewarding without making rare Porbles common.</dd>
+      <dt>How it works</dt>
+      <dd>Two Porbles are placed in a Synthesizing Circle and produce a child of one of the two species. They have to share an element and be within one rarity of each other. Players start with 2 slots and can upgrade up to 10, and placing a pair costs more the rarer they are. The child inherits the parents' highest Innate Talent stat, or up to 5 stats with upgrades, while its personality and passive are rolled at random.</dd>
+    </dl>
+
+    <div class="table-wrap">
+      <table class="cs-table synth">
+        <thead><tr><th>Parents</th><th>Common</th><th>Uncommon</th><th>Rare</th><th>Legendary</th></tr></thead>
+        <tbody>
+          <tr><th>Common</th><td>50 / 50</td><td>20% Uncommon</td><td class="na">–</td><td class="na">–</td></tr>
+          <tr><th>Uncommon</th><td>20% Uncommon</td><td>50 / 50</td><td>10% Rare</td><td class="na">–</td></tr>
+          <tr><th>Rare</th><td class="na">–</td><td>10% Rare</td><td>50 / 50</td><td>5% Legendary</td></tr>
+          <tr><th>Legendary</th><td class="na">–</td><td class="na">–</td><td>5% Legendary</td><td>50 / 50</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="diag-note">Chance of getting the rarer parent's species. Same-rarity pairs split 50/50 between the two species.</p>
+
+    <div class="rarity-bands">
+      <div class="rb c"><span class="rn">Common</span><span class="rr">No limit</span></div>
+      <div class="rb u"><span class="rn">Uncommon</span><span class="rr">50 times</span></div>
+      <div class="rb r"><span class="rn">Rare</span><span class="rr">10 times</span></div>
+      <div class="rb l"><span class="rn">Legendary</span><span class="rr">Once</span></div>
+    </div>
+    <p class="diag-note">How many times a Porble can breed. A child gets half of its parent's limit.</p>
+
+    <dl class="dgrid">
+      <dt>Why the limit matters</dt>
+      <dd>The breeding limit is the real supply control. A Legendary can only breed once, and since each child gets half of its parent's limit, a line of rare Porbles runs out within a few generations. Rare Porbles stay rare, no matter how many players are breeding.</dd>
+    </dl>
+  </article>
+
+  <!-- 11 -->
+  <article class="decision">
+    <p class="dnum">11</p>
+    <h3>Fusion: turning Porbles into upgrades</h3>
+    <dl class="dgrid">
+      <dt>The idea</dt>
+      <dd>Breeding adds Porbles to the world, so something has to take them out again. Fusion does that, and gives players a good reason to want it.</dd>
+      <dt>How it works</dt>
+      <dd>Instead of merging two Porbles directly, players break one down at an Altar. Each species has its own drop chances for ingredients, like stat, color and elemental essences, and very rarely a passive essence. The ingredients then go into a Cauldron, on a timer, to craft augmentations, dyes and Majesty Orbs for the Porble the player wants to improve.</dd>
+      <dt>Augmentations</dt>
+      <dd>Augmentations range from +3 to a stat to learning a second element. A Majesty upgrade evolves the Porble and unlocks stronger special attacks.</dd>
+      <dt>Fusion points</dt>
+      <dd>In the first version of Fusion, whole Porbles were fed into another one for Fusion Points. The points a Porble gives depend on its rarity, and the points needed for each new Fusion level grow quickly, with Rare and Legendary on a steeper curve.</dd>
+    </dl>
+    <div class="formula">
+      <p class="fname">Points a Porble gives</p>
+      <p class="feq">FP = (max IT total for its rarity / 3) &times; F, &nbsp; F = 1.5 Common, 2 Uncommon, 5 Rare, 10 Legendary</p>
+      <p class="fname">Total points for Fusion level n</p>
+      <p class="feq">Common, Uncommon: c &times; (n &minus; 1)&sup2; &nbsp;&nbsp; Rare, Legendary: c &times; (n &minus; 1)<sup>2.5</sup></p>
+    </div>
+    <div class="table-wrap">
+      <table class="cs-table">
+        <thead><tr><th>Rarity</th><th>IT total range</th><th>FP it gives</th><th>FP for level 10</th><th>Same-rarity Porbles to max</th></tr></thead>
+        <tbody>
+          <tr><td>Common</td><td>6–15</td><td>7.5</td><td>324</td><td>about 43</td></tr>
+          <tr><td>Uncommon</td><td>16–30</td><td>20</td><td>810</td><td>about 41</td></tr>
+          <tr><td>Rare</td><td>31–45</td><td>90</td><td>5,589</td><td>about 62</td></tr>
+          <tr><td>Legendary</td><td>46–60</td><td>200</td><td>9,720</td><td>about 49</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="diag-note">IT totals are tied to rarity, so a rarer Porble always rolls more talent. Maxing one Porble takes dozens of others, which is what makes Fusion the biggest Porble sink in the game.</p>
+    <dl class="dgrid">
+      <dt>Why it works for the economy</dt>
+      <dd>Every Fusion destroys a Porble, and only Porbles synced to the chain can be used, so it directly lowers the number of Porbles on chain. The timers create a natural PFT sink through speed-ups. And a fully augmented Porble is one of a kind, which gives Heroes something worth selling to Competitive players.</dd>
+    </dl>
+  </article>
+
+  <!-- 12 -->
+  <article class="decision feature">
+    <p class="dnum">12</p>
+    <h3>Seasons, battle pass and staking tiers</h3>
+    <dl class="dgrid">
+      <dt>The idea</dt>
+      <dd>A season gives players a reason to come back every day, and gives staking a clear reward. Both had to be paced so that a regular player finishes, but only just.</dd>
+      <dt>Structure</dt>
+      <dd>A season lasts 3 months, with 200 levels split into 10 tiers of 20. Experience comes from daily and weekly quests, daily and weekly challenges, Fusion, Architect maps and repeatable map nodes. I modelled every source per day, week and month, and tuned the level curve so the full track takes about 67 days at a normal pace, leaving room for missed days.</dd>
+      <dt>Free and premium</dt>
+      <dd>The free path gives a reward on every level for the first 20 levels, then thins out, for 92 rewards in total. The premium path has a reward on every level, 199 in total, including charms, higher tier items and a Hero. Buying premium late unlocks every premium reward up to the player's current level, so nobody is punished for deciding later.</dd>
+      <dt>Staking tiers</dt>
+      <dd>Above the free tier are three tiers tied to staking PFT: Bronze after one day, Silver after a week and Gold after three weeks. Stakers receive vouchers every day, paced so that after 45 days they have enough to claim every reward. Players who start late can buy vouchers for up to 100 levels in the last two weeks. Rewards are claimed in order, so nobody can jump straight to the best ones.</dd>
+      <dt>Hero levels</dt>
+      <dd>Separately from the season, Hero Points are earned through quests and achievements and spent to level a Hero up to 100. A higher-level Hero can use stronger Porbles and enter harder maps. Points have to be reset before a Hero goes on the marketplace, so a leveled Hero can't be sold as a shortcut.</dd>
+    </dl>
+
+    <div class="table-wrap">
+      <table class="cs-table">
+        <thead><tr><th>Experience source</th><th>Per day</th><th>Experience each</th></tr></thead>
+        <tbody>
+          <tr><td>Daily quests</td><td>6</td><td>200–500</td></tr>
+          <tr><td>Daily challenges</td><td>4</td><td>300–600</td></tr>
+          <tr><td>Weekly quests</td><td>2 a week</td><td>700–1,000</td></tr>
+          <tr><td>Weekly challenges</td><td>2 a week</td><td>1,000–1,500</td></tr>
+          <tr><td>Porble Fusion</td><td>up to 10</td><td>100–1,600</td></tr>
+          <tr><td>Architect map nodes</td><td>up to 10</td><td>500</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </article>
+
+  <!-- 13 -->
+  <article class="decision">
+    <p class="dnum">13</p>
+    <h3>Launching in phases</h3>
+    <dl class="dgrid">
+      <dt>The plan</dt>
+      <dd>The plan was to launch with generous rewards to bring players in, add more sinks and lower token rewards as the economy settled, and finally open up a player-run marketplace and player-made content. Architect maps would start as maps we built ourselves, run by NPC Architects, and would be handed over to real Architect players once there were enough Heroes to keep them busy.</dd>
+      <dt>Watching it</dt>
+      <dd>Every point in the cycle had to be tracked, so we could compare how much PFT we expected to flow in and out with what actually did, and use events to steer wherever the two drifted apart.</dd>
+    </dl>
+  </article>
+
+</section>
+
+<section id="sheets">
+  <h2>From the balancing sheets</h2>
+  <p class="section-note">The spreadsheets I used to design and balance the economy. Click a sheet to see it larger.</p>
+  <div class="docgrid">
+    <a class="doccard" href="img/sheets/seasonal-sources.png" target="_blank" rel="noopener">
+      <span class="docpaper"><img src="img/sheets/seasonal-sources.png" alt="Seasonal experience sources" loading="lazy"></span>
+      <span class="doccap">Seasonal experience sources</span>
+    </a>
+    <a class="doccard" href="img/sheets/seasonal-levels.png" target="_blank" rel="noopener">
+      <span class="docpaper"><img src="img/sheets/seasonal-levels.png" alt="Seasonal level curve" loading="lazy"></span>
+      <span class="doccap">Seasonal level curve</span>
+    </a>
+    <a class="doccard" href="img/sheets/seasonal-free.png" target="_blank" rel="noopener">
+      <span class="docpaper"><img src="img/sheets/seasonal-free.png" alt="Free path rewards" loading="lazy"></span>
+      <span class="doccap">Free path rewards</span>
+    </a>
+    <a class="doccard" href="img/sheets/calculator.png" target="_blank" rel="noopener">
+      <span class="docpaper"><img src="img/sheets/calculator.png" alt="Porble stat calculator" loading="lazy"></span>
+      <span class="doccap">Porble stat calculator</span>
+    </a>
+    <a class="doccard" href="img/sheets/info.png" target="_blank" rel="noopener">
+      <span class="docpaper"><img src="img/sheets/info.png" alt="Porble information and constants" loading="lazy"></span>
+      <span class="doccap">Porble information and constants</span>
+    </a>
+    <a class="doccard" href="img/sheets/base.png" target="_blank" rel="noopener">
+      <span class="docpaper"><img src="img/sheets/base.png" alt="Base stats per species" loading="lazy"></span>
+      <span class="doccap">Base stats per species</span>
+    </a>
+    <a class="doccard" href="img/sheets/formulas.png" target="_blank" rel="noopener">
+      <span class="docpaper"><img src="img/sheets/formulas.png" alt="Formulas and multipliers" loading="lazy"></span>
+      <span class="doccap">Formulas and multipliers</span>
+    </a>
+    <a class="doccard" href="img/sheets/exp.png" target="_blank" rel="noopener">
+      <span class="docpaper"><img src="img/sheets/exp.png" alt="Experience per level, by rarity" loading="lazy"></span>
+      <span class="doccap">Experience per level, by rarity</span>
+    </a>
+    <a class="doccard" href="img/sheets/synth.png" target="_blank" rel="noopener">
+      <span class="docpaper"><img src="img/sheets/synth.png" alt="Breeding odds and limits" loading="lazy"></span>
+      <span class="doccap">Breeding odds and limits</span>
+    </a>
+    <a class="doccard" href="img/sheets/fusion.png" target="_blank" rel="noopener">
+      <span class="docpaper"><img src="img/sheets/fusion.png" alt="Fusion points" loading="lazy"></span>
+      <span class="doccap">Fusion points</span>
+    </a>
+    <a class="doccard" href="img/sheets/dist.png" target="_blank" rel="noopener">
+      <span class="docpaper"><img src="img/sheets/dist.png" alt="Porble distribution by biome and map" loading="lazy"></span>
+      <span class="doccap">Porble distribution by biome and map</span>
+    </a>
+  </div>
+</section>
+
+<section id="takeaway">
+  <h2>What I took from it</h2>
+  <p class="intro">
+    Designing systems around a token taught me to look at every system twice: once for how it feels to play, and once for what it does to the flow of value through the game. A timer is a pacing tool, but it's also a sink. A breeding limit is a rule, but it's also what decides how much a rare Porble is worth.
+  </p>
+  <p class="intro">
+    The biggest lesson was that players will always do whatever earns the most, so the economy has to make the fun choice and the profitable choice the same one. Giving each role something only it can make, and something it can only get from the others, did more for that than any reward number ever could.
+  </p>
+  <nav class="endnav">
+    <a class="btn btn-steam" href="https://store.steampowered.com/app/2464460/Portal_Fantasy/" target="_blank" rel="noopener"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M11.979 0C5.678 0 .511 4.86.022 11.037l6.432 2.658c.545-.371 1.203-.59 1.912-.59.063 0 .125.004.188.006l2.861-4.142V8.91c0-2.495 2.028-4.524 4.524-4.524 2.494 0 4.524 2.031 4.524 4.527s-2.03 4.525-4.524 4.525h-.105l-4.076 2.911c0 .052.004.105.004.159 0 1.875-1.515 3.396-3.39 3.396-1.635 0-3.016-1.173-3.331-2.727L.436 15.27C1.862 20.307 6.486 24 11.979 24c6.627 0 11.999-5.373 11.999-12S18.605 0 11.979 0zM7.54 18.21l-1.473-.61c.262.543.714.999 1.314 1.25 1.297.539 2.793-.076 3.332-1.375.263-.63.264-1.319.005-1.949s-.75-1.121-1.377-1.383c-.624-.26-1.29-.249-1.878-.03l1.523.63c.956.4 1.409 1.5 1.009 2.455-.397.957-1.497 1.41-2.454 1.012H7.54zm11.415-9.303c0-1.662-1.353-3.015-3.015-3.015-1.665 0-3.015 1.353-3.015 3.015 0 1.665 1.35 3.015 3.015 3.015 1.663 0 3.015-1.35 3.015-3.015zm-5.273-.005c0-1.252 1.013-2.266 2.265-2.266 1.249 0 2.266 1.014 2.266 2.266 0 1.251-1.017 2.265-2.266 2.265-1.253 0-2.265-1.014-2.265-2.265z"/></svg>Visit Portal Fantasy on Steam</a>
+    <a class="btn btn-design" href="index.html"><span aria-hidden="true">&larr;</span>Back to portfolio</a>
+  </nav>
+</section>
+
+</main>
+
+<footer>
+  <p>Zagreb, Croatia · <a href="mailto:jakubi.ivan@gmail.com">jakubi.ivan@gmail.com</a></p>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Portal Fantasy: Game Design Case Study - Ivan Jakubi</title>
+<meta name="description" content="How I designed Portal Fantasy, a pixel-art creature collection RPG: the turn-based battle system and its playtest balancing, retention systems and content tools.">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="case-study.css">
+<script src="lightbox.js" defer></script>
+</head>
+<body class="cs">
+
+<nav class="cs-top">
+  <a href="index.html">&larr; Back to portfolio</a>
+  <a href="portal-fantasy-economy.html">Game economy case study &rarr;</a>
+</nav>
+
+<header class="cs-hero">
+  <p class="eyebrow"><svg class="eb-ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="7.25" cy="7.25" r="4.25"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="1.2"/><path d="M15.25 3l4.25 7.5h-8.5z"/></svg>Game design case study</p>
+  <h1>Portal Fantasy</h1>
+  <p class="role">Game Designer · Freelance · 2022–2024</p>
+
+  <figure class="cs-cover">
+    <img src="https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2464460/1c6782b2892e9d69c6667b20ecb2655197856c27/ss_1c6782b2892e9d69c6667b20ecb2655197856c27.1920x1080.jpg"
+         alt="Portal Fantasy screenshot" width="1920" height="1080">
+  </figure>
+
+  <p class="intro">
+    Portal Fantasy is a pixel-art creature collection RPG. Players catch
+    creatures called Porbles, build a team of three, explore hand-built maps
+    full of puzzles and traps, and fight in turn-based battles. It is also a
+    Web3 game, with its own token and Porbles that can live on the blockchain.
+  </p>
+  <p class="intro">
+    I worked on it as a freelance game designer, and I was responsible for the
+    game design across the whole game, including the economy systems built around
+    its currencies. That covered the
+    battle system, from the first document through playtests and balancing, as
+    well as retention and the tools used to fill the maps with content. The
+    economy has its own page: the <a href="portal-fantasy-economy.html">game economy case study</a>.
+  </p>
+
+  <dl class="facts">
+    <div><dt>Genre</dt><dd>Creature collection RPG</dd></div>
+    <div><dt>Combat</dt><dd>Turn-based, teams of 3</dd></div>
+    <div><dt>Elements</dt><dd>6</dd></div>
+    <div><dt>Economy</dt><dd>Web3, PFT token</dd></div>
+    <div><dt>Released</dt><dd>16 Apr 2025, Steam</dd></div>
+    <div><dt>Tools</dt><dd>Google Sheets, Figma, JSON</dd></div>
+  </dl>
+</header>
+
+<main>
+
+<section id="design">
+  <h2>Design work</h2>
+
+  <!-- 01 -->
+  <article class="decision feature">
+    <p class="dnum">01</p>
+    <h3>A turn-based battle built around one resource</h3>
+    <dl class="dgrid">
+      <dt>The idea</dt>
+      <dd>A lot of creature battlers come down to picking your strongest attack every turn. I wanted every turn to be a small decision about when to spend and when to save.</dd>
+      <dt>How it works</dt>
+      <dd>
+        Everything runs on <b class="hl2">Momentum</b>. Porbles gain it by attacking, or by getting hit while defending, up to a maximum of 20. Special attacks cost Momentum and have no cooldowns, so the only question is when to spend it.
+      </dd>
+    </dl>
+
+    <div class="diagram">
+      <p class="scores-title">The Momentum bar</p>
+      <div class="mbar">
+        <div class="mtrack">
+          <div class="mzone build" style="width:75%"><span>Build up: attack, or defend to gain more</span></div>
+          <div class="mzone reck" style="width:25%"><span>Reckless</span></div>
+        </div>
+        <div class="mscale">
+          <span style="left:0">0</span><span style="left:25%">5</span><span style="left:50%">10</span><span class="hot" style="left:75%">15</span><span style="left:100%">20</span>
+        </div>
+      </div>
+      <div class="mlegend">
+        <div><p class="bh">Special attacks</p><p>Each one has its own Momentum cost. Using one empties the bar, so the player has to build it up again.</p></div>
+        <div><p class="bh">Reckless Mode, at 15+</p><p>Switching it on doesn't use the turn. Every attack crits and attack speed goes up by 50%, but special attacks, defend and swapping are locked and defense is halved.</p></div>
+        <div><p class="bh">Swapping costs it all</p><p>A Porble that gets swapped out loses all of its Momentum, so swapping is never a free move.</p></div>
+      </div>
+    </div>
+
+    <dl class="dgrid">
+      <dt>Turn order</dt>
+      <dd>Turns aren't strictly one after the other. Each Porble has an attack speed timer, and the lowest timer acts next, so a fast Porble can act twice before a slow one. The player sees it all on a turn bar at the top of the screen, with each Porble's portrait moving toward its turn.</dd>
+      <dt>Status effects</dt>
+      <dd>Effects either last a set number of turns or stay until they are cured, even after the battle. Hitting a Porble with an effect it already has resets the timer instead of stacking, which keeps them readable.</dd>
+    </dl>
+  </article>
+
+  <figure class="cs-shot">
+    <img src="https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2464460/922ee9e7c2d966797a61f8acef03a10e2858afe2/ss_922ee9e7c2d966797a61f8acef03a10e2858afe2.1920x1080.jpg"
+         alt="Portal Fantasy battle screenshot" loading="lazy" width="1920" height="1080">
+  </figure>
+
+  <!-- 02 -->
+  <article class="decision">
+    <p class="dnum">02</p>
+    <h3>Six elements in two loops</h3>
+    <dl class="dgrid">
+      <dt>The idea</dt>
+      <dd>Elements had to be easy to learn but still give team building some depth. Instead of one big chart, I split them into two loops.</dd>
+    </dl>
+
+    <div class="diagram eldiag">
+      <svg viewBox="0 0 560 250" role="img" aria-label="Fire beats Gaia, Gaia beats Thunder, Thunder beats Water, Water beats Fire. Dark and Light beat each other.">
+        <defs>
+          <marker id="ea" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+            <path d="M0 0 L10 5 L0 10 z" fill="#8b8f99"/>
+          </marker>
+        </defs>
+        <!-- main loop -->
+        <path d="M174 52 Q215 52 215 90" class="ea" marker-end="url(#ea)"/>
+        <path d="M215 162 Q215 198 176 198" class="ea" marker-end="url(#ea)"/>
+        <path d="M106 198 Q65 198 65 162" class="ea" marker-end="url(#ea)"/>
+        <path d="M65 90 Q65 52 104 52" class="ea" marker-end="url(#ea)"/>
+        <g class="el fire"><circle cx="140" cy="52" r="32"/><text x="140" y="57">Fire</text></g>
+        <g class="el gaia"><circle cx="215" cy="126" r="32"/><text x="215" y="131">Gaia</text></g>
+        <g class="el thunder"><circle cx="140" cy="198" r="32"/><text x="140" y="203">Thunder</text></g>
+        <g class="el water"><circle cx="65" cy="126" r="32"/><text x="65" y="131">Water</text></g>
+        <text x="140" y="130" class="el-mid">beats</text>
+        <!-- dark / light -->
+        <path d="M395 106 Q440 78 484 104" class="ea" marker-end="url(#ea)"/>
+        <path d="M485 146 Q440 174 396 148" class="ea" marker-end="url(#ea)"/>
+        <g class="el dark"><circle cx="370" cy="126" r="32"/><text x="370" y="131">Dark</text></g>
+        <g class="el light"><circle cx="510" cy="126" r="32"/><text x="510" y="131">Light</text></g>
+        <text x="440" y="236" class="el-cap">strong against each other</text>
+        <text x="140" y="246" class="el-cap">each one beats the next</text>
+      </svg>
+      <p class="diag-note">A strong hit deals double damage and a weak one deals half. A Porble is also immune to status effects of its own element.</p>
+    </div>
+  </article>
+
+  <!-- 03 -->
+  <article class="decision feature">
+    <p class="dnum">03</p>
+    <h3>Playtests broke the battle, so I fixed it</h3>
+    <dl class="dgrid">
+      <dt>What testers did</dt>
+      <dd>One tester never used Reckless Mode because battles always ended before he could switch it on. He just defended over and over, built up Momentum and then wiped out the enemy. Another said that with no Momentum at the start of a fight, defending was the obvious first move every time.</dd>
+      <dt>The problem</dt>
+      <dd>Defending was too good. It was the safe choice and the fastest way to build Momentum at the same time, so it made every other option pointless. And yet the mid-fight decisions about Momentum were exactly what testers liked most.</dd>
+    </dl>
+
+    <div class="table-wrap">
+      <table class="cs-table">
+        <thead><tr><th>Problem</th><th>What I changed</th></tr></thead>
+        <tbody>
+          <tr><td>Defending was the best move in every situation</td><td>Cut the Momentum bonus from defending from double to 1.3x. Defend stayed useful, but stopped being the answer to everything.</td></tr>
+          <tr><td>One early special attack ended fights too fast</td><td>Lowered its damage from 50 to 40 and raised its Momentum cost to 15.</td></tr>
+          <tr><td>Attacks on the whole team wiped out support Porbles</td><td>Support Porbles now take half damage from attacks that hit the whole team.</td></tr>
+          <tr><td>Losing a Porble meant losing control</td><td>The player now chooses which Porble to send in next, and that Porble acts first. The same rule applies to enemy trainers.</td></tr>
+          <tr><td>Enemies spammed special attacks from turn one</td><td>Fixed a passive ability that gave far too much Momentum. It now gives 2 Momentum at the end of the team's turn.</td></tr>
+          <tr><td>Players could farm weak Porbles for easy levels</td><td>Porbles that are 10 or more levels above their opponent no longer gain experience.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <dl class="dgrid">
+      <dt>Result</dt>
+      <dd>The fixes kept the part testers enjoyed, balancing Momentum through a fight, and removed the one strategy that made all the other choices pointless.</dd>
+    </dl>
+  </article>
+
+  <!-- 04 -->
+  <article class="decision">
+    <p class="dnum">04</p>
+    <h3>Making wins feel big</h3>
+    <dl class="dgrid">
+      <dt>The idea</dt>
+      <dd>Beating an enemy trainer should feel like a moment, not just a health bar hitting zero.</dd>
+      <dt>How it works</dt>
+      <dd>When the system calculates that the next hit will end the fight, the last frames of the attack play in slow motion, the screen shakes three times and the music cuts out. Then the hit lands and the victory jingle plays. Critical hits get their own effect and a short screen shake, and on the player's turn their Porble does small hops so it's always clear whose turn it is.</dd>
+    </dl>
+  </article>
+
+  <!-- 05 -->
+  <article class="decision">
+    <p class="dnum">05</p>
+    <h3>Systems that bring players back</h3>
+    <div class="bossgrid">
+      <div class="bcard"><p class="bh">Daily quests</p><p>Six at a time. Four are built from the map the player visited last, so a quest never asks for something they can't do yet. Each quest is put together from an action (capture, defeat, craft, gather) and a target (a Porble type, an element or an item).</p></div>
+      <div class="bcard"><p class="bh">Daily rewards</p><p>Missing a day pauses the streak instead of resetting it. The player picks up where they left off, so a busy week is never punished.</p></div>
+      <div class="bcard"><p class="bh">Deep Sleep</p><p>A knocked-out Porble rests on a timer before it can fight again. The timer scales with rarity, from seconds for a common Porble to days for a legendary one, so rare Porbles carry real weight.</p></div>
+    </div>
+  </article>
+
+  <!-- 07 -->
+  <article class="decision">
+    <p class="dnum">06</p>
+    <h3>Tools for filling the world</h3>
+    <dl class="dgrid">
+      <dt>The idea</dt>
+      <dd>Every map needed wild Porbles, and placing them by hand would have been slow and easy to get wrong.</dd>
+      <dt>How it works</dt>
+      <dd>I specified the encounter zone setup the team used on every map. A designer picks a biome, chooses Porbles from that biome's pool, sets how often each one appears (always adding up to 100%), sets a level range, and sets the range of each Porble's hidden stats. Content went in through JSON, so maps could be filled and tuned without touching code.</dd>
+    </dl>
+  </article>
+
+</section>
+
+<section id="docs">
+  <h2>From the design documents</h2>
+  <p class="section-note">Sections from the Porble Battle GDD I wrote. Click a page to read it in full.</p>
+  <div class="docgrid">
+    <a class="doccard" href="img/docs/pf-turns.png" target="_blank" rel="noopener">
+      <span class="docpaper"><img src="img/docs/pf-turns.png" alt="Battle GDD: turn order" loading="lazy"></span>
+      <span class="doccap">Battle GDD: turn order</span>
+    </a>
+    <a class="doccard" href="img/docs/pf-momentum.png" target="_blank" rel="noopener">
+      <span class="docpaper"><img src="img/docs/pf-momentum.png" alt="Momentum and Reckless Mode" loading="lazy"></span>
+      <span class="doccap">Momentum and Reckless Mode</span>
+    </a>
+    <a class="doccard" href="img/docs/pf-status.png" target="_blank" rel="noopener">
+      <span class="docpaper"><img src="img/docs/pf-status.png" alt="Status effects and passives" loading="lazy"></span>
+      <span class="doccap">Status effects and passives</span>
+    </a>
+    <a class="doccard" href="img/docs/pf-elements.png" target="_blank" rel="noopener">
+      <span class="docpaper"><img src="img/docs/pf-elements.png" alt="Element chart" loading="lazy"></span>
+      <span class="doccap">Element chart</span>
+    </a>
+  </div>
+</section>
+
+<section id="gallery">
+  <h2>Screenshots</h2>
+  <div class="gallery">
+    <a href="https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2464460/4425fff257128dee8c5e4099f1881b2ac1de3123/ss_4425fff257128dee8c5e4099f1881b2ac1de3123.1920x1080.jpg" target="_blank" rel="noopener"><img src="https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2464460/4425fff257128dee8c5e4099f1881b2ac1de3123/ss_4425fff257128dee8c5e4099f1881b2ac1de3123.600x338.jpg" alt="Portal Fantasy screenshot" loading="lazy"></a>
+    <a href="https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2464460/351a813ed8b4d818ff8033cf0168130b4168f937/ss_351a813ed8b4d818ff8033cf0168130b4168f937.1920x1080.jpg" target="_blank" rel="noopener"><img src="https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2464460/351a813ed8b4d818ff8033cf0168130b4168f937/ss_351a813ed8b4d818ff8033cf0168130b4168f937.600x338.jpg" alt="Portal Fantasy screenshot" loading="lazy"></a>
+    <a href="https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2464460/e84b5647ec48d112bd84a98e3ef4692ea9ca1b77/ss_e84b5647ec48d112bd84a98e3ef4692ea9ca1b77.1920x1080.jpg" target="_blank" rel="noopener"><img src="https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2464460/e84b5647ec48d112bd84a98e3ef4692ea9ca1b77/ss_e84b5647ec48d112bd84a98e3ef4692ea9ca1b77.600x338.jpg" alt="Portal Fantasy screenshot" loading="lazy"></a>
+  </div>
+</section>
+
+<section id="takeaway">
+  <h2>What I took from it</h2>
+  <p class="intro">
+    The battle system taught me that playtests find what spreadsheets can't. On paper, defending was one option among many. In players' hands, it was the only option that mattered. Watching how people actually played, and then changing one number, did more for the game than any new feature would have.
+  </p>
+  <nav class="endnav">
+    <a class="btn btn-steam" href="https://store.steampowered.com/app/2464460/Portal_Fantasy/" target="_blank" rel="noopener"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M11.979 0C5.678 0 .511 4.86.022 11.037l6.432 2.658c.545-.371 1.203-.59 1.912-.59.063 0 .125.004.188.006l2.861-4.142V8.91c0-2.495 2.028-4.524 4.524-4.524 2.494 0 4.524 2.031 4.524 4.527s-2.03 4.525-4.524 4.525h-.105l-4.076 2.911c0 .052.004.105.004.159 0 1.875-1.515 3.396-3.39 3.396-1.635 0-3.016-1.173-3.331-2.727L.436 15.27C1.862 20.307 6.486 24 11.979 24c6.627 0 11.999-5.373 11.999-12S18.605 0 11.979 0zM7.54 18.21l-1.473-.61c.262.543.714.999 1.314 1.25 1.297.539 2.793-.076 3.332-1.375.263-.63.264-1.319.005-1.949s-.75-1.121-1.377-1.383c-.624-.26-1.29-.249-1.878-.03l1.523.63c.956.4 1.409 1.5 1.009 2.455-.397.957-1.497 1.41-2.454 1.012H7.54zm11.415-9.303c0-1.662-1.353-3.015-3.015-3.015-1.665 0-3.015 1.353-3.015 3.015 0 1.665 1.35 3.015 3.015 3.015 1.663 0 3.015-1.35 3.015-3.015zm-5.273-.005c0-1.252 1.013-2.266 2.265-2.266 1.249 0 2.266 1.014 2.266 2.266 0 1.251-1.017 2.265-2.266 2.265-1.253 0-2.265-1.014-2.265-2.265z"/></svg>Visit Portal Fantasy on Steam</a>
+    <a class="btn btn-design" href="index.html"><span aria-hidden="true">&larr;</span>Back to portfolio</a>
+  </nav>
+</section>
+
+</main>
+
+<footer>
+  <p>Zagreb, Croatia · <a href="mailto:jakubi.ivan@gmail.com">jakubi.ivan@gmail.com</a></p>
+</footer>
+
+</body>
+</html>
